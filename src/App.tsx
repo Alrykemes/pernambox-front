@@ -1,12 +1,10 @@
-import Login from "@/pages/Login.tsx";
+import SignIn from "@/pages/SignIn.tsx";
 import { Route, Routes } from "react-router-dom";
 
-function App() {
+export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<SignIn />} />
     </Routes>
   );
 }
-
-export default App;
