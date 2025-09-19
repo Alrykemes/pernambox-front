@@ -17,7 +17,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-blue-600 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-600 to-blue-700 p-4">
       <div className="absolute top-5 left-0 h-32 w-32 rounded-tr-[50%] rounded-br-[50%] bg-blue-400" />
 
       <div className="flex min-h-[600px] w-full max-w-5xl overflow-hidden rounded-lg bg-white shadow-lg">

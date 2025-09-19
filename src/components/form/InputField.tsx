@@ -20,7 +20,13 @@ export function InputField<T extends FieldValues>({
   return (
     <BaseFormField control={control} name={name} label={label}>
       {(field) => (
-        <Input id={name} placeholder={placeholder} type={type} {...field} className="h-12"/>
+        <Input
+          id={name}
+          placeholder={placeholder}
+          type={type}
+          {...field}
+          className="h-12"
+        />
       )}
     </BaseFormField>
   );
