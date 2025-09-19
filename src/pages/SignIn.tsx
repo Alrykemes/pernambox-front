@@ -1,5 +1,5 @@
 import logo from "@/assets/defesa-civil.png";
-import stockMan from "@/assets/stock-man.png";
+import storage from "@/assets/storage.jpg";
 import FormWrapper from "@/components/form/FormWrapper";
 import { InputField } from "@/components/form/InputField";
 import SubmitButton from "@/components/form/SubmitButton";
@@ -20,13 +20,13 @@ export default function SignIn() {
     <div className="flex min-h-screen items-center justify-center bg-blue-600 p-4">
       <div className="absolute top-5 left-0 h-32 w-32 rounded-tr-[50%] rounded-br-[50%] bg-blue-400" />
 
-      <div className="flex w-full max-w-5xl overflow-hidden rounded-lg bg-white shadow-lg">
+      <div className="flex min-h-[600px] w-full max-w-5xl overflow-hidden rounded-lg bg-white shadow-lg">
         <div
           className="hidden bg-cover bg-center md:block md:w-1/2"
-          style={{ backgroundImage: `url(${stockMan})` }}
+          style={{ backgroundImage: `url(${storage})` }}
         />
 
-        <div className="flex w-full flex-col justify-center p-8 md:w-1/2">
+        <div className="flex w-full flex-col gap-20 p-8 md:w-1/2">
           <div className="mb-6 flex flex-col items-center space-y-2">
             <div className="flex items-center space-x-2">
               <img src={logo} alt="logo" className="w-16" />
