@@ -7,7 +7,7 @@ import LogoHeader from "@/components/LogoHeader";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useSignInForm } from "@/hooks/useSignInForm";
-import type { SignInType } from "@/types/signIn";
+import type { SignInType } from "@/schemas/signIn";
 import { Link } from "react-router-dom";
 
 export default function SignIn() {
@@ -53,7 +53,7 @@ export default function SignIn() {
               </div>
               <div>
                 <Link
-                  to="#"
+                  to="/password-recovery"
                   className="ml-4 text-sm text-orange-500 hover:underline"
                 >
                   Esqueceu sua senha?
@@ -73,8 +73,9 @@ export default function SignIn() {
       <div className="hidden w-1/2 items-center justify-center lg:flex">
         <img
           src={checkingStock}
-          alt="Ilustração de verificação de estoque"
-          className="h-80 w-80 object-contain"
+          alt="Animação: verificação de estoque"
+          className="h-100 w-100 object-contain"
+          loading="lazy"
         />
       </div>
     </div>

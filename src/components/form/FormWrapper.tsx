@@ -20,7 +20,11 @@ export default function FormWrapper<T extends FieldValues>({
 }: FormWrapperProps<T>) {
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className={className}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        noValidate
+        className={className}
+      >
         {children}
       </form>
     </Form>
