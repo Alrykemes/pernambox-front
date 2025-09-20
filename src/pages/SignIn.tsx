@@ -1,10 +1,14 @@
-import logo from "@/assets/defesa-civil.png";
-import storage from "@/assets/storage.jpg";
+import checkingStock from "@/assets/checking-stock.gif";
 import FormWrapper from "@/components/form/FormWrapper";
-import { InputField } from "@/components/form/InputField";
+import InputField from "@/components/form/InputField";
+import PasswordField from "@/components/form/PasswordField";
 import SubmitButton from "@/components/form/SubmitButton";
+import LogoHeader from "@/components/LogoHeader";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { useSignInForm } from "@/hooks/useSignInForm";
 import type { SignInType } from "@/types/signIn";
+import { Link } from "react-router-dom";
 
 export default function SignIn() {
   const form = useSignInForm();
@@ -17,28 +21,10 @@ export default function SignIn() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-600 to-blue-700 p-4">
-      <div className="absolute top-5 left-0 h-32 w-32 rounded-tr-[50%] rounded-br-[50%] bg-blue-400" />
-
-      <div className="flex min-h-[600px] w-full max-w-5xl overflow-hidden rounded-lg bg-white shadow-lg">
-        <div
-          className="hidden bg-cover bg-center md:block md:w-1/2"
-          style={{ backgroundImage: `url(${storage})` }}
-        />
-
-        <div className="flex w-full flex-col gap-20 p-8 md:w-1/2">
-          <div className="mb-6 flex flex-col items-center space-y-2">
-            <div className="flex items-center space-x-2">
-              <img src={logo} alt="logo" className="w-16" />
-              <h1 className="text-3xl font-bold text-orange-500">
-                PernambuBox
-              </h1>
-            </div>
-            <p className="text-center text-sm text-gray-400 italic">
-              Controle de Estoque Inteligente
-            </p>
-          </div>
-
+    <div className="flex min-h-screen">
+      <div className="flex w-full flex-col items-center justify-center lg:w-1/2">
+        <LogoHeader />
+        <div className="w-full max-w-md p-8">
           <FormWrapper form={form} onSubmit={onSubmit}>
             <div className="space-y-4">
               <InputField
@@ -47,24 +33,49 @@ export default function SignIn() {
                 label="E-mail"
                 type="text"
                 placeholder="john.doe@example.com"
+                className="h-12"
               />
-              <InputField
+
+              <PasswordField
                 control={form.control}
                 name="password"
                 label="Senha"
-                type="password"
                 placeholder="••••••••"
+                type="password"
               />
             </div>
-
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex items-center">
+                <Checkbox id="remember" className="mr-2" />
+                <Label htmlFor="remember" className="text-sm">
+                  Lembrar-me
+                </Label>
+              </div>
+              <div>
+                <Link
+                  to="#"
+                  className="ml-4 text-sm text-orange-500 hover:underline"
+                >
+                  Esqueceu sua senha?
+                </Link>
+              </div>
+            </div>
             <SubmitButton
               isSubmitting={form.formState.isSubmitting}
-              className="mt-6 w-full"
+              className="mt-6 h-12 w-full bg-orange-500 font-bold text-white hover:bg-orange-600"
             >
               Entrar
             </SubmitButton>
           </FormWrapper>
         </div>
+      </div>
+
+      <div className="hidden w-1/2 items-center justify-center lg:flex">
+        <img
+          src={checkingStock}
+          alt="Ilustração de verificação de estoque"
+          className="h-80 w-80 object-contain"
+        />
       </div>
     </div>
   );

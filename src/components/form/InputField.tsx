@@ -8,14 +8,16 @@ export interface InputFieldProps<T extends FieldValues> {
   label: string;
   placeholder?: string;
   type?: string;
+  className?: string;
 }
 
-export function InputField<T extends FieldValues>({
+export default function InputField<T extends FieldValues>({
   control,
   name,
   label,
   placeholder,
   type = "text",
+  className,
 }: InputFieldProps<T>) {
   return (
     <BaseFormField control={control} name={name} label={label}>
@@ -24,8 +26,8 @@ export function InputField<T extends FieldValues>({
           id={name}
           placeholder={placeholder}
           type={type}
+          className={className}
           {...field}
-          className="h-12"
         />
       )}
     </BaseFormField>
