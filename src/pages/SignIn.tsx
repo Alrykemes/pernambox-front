@@ -1,4 +1,4 @@
-import checkingStock from "@/assets/checking-stock.gif";
+import checkingStock from "@/assets/images/checking-stock.gif";
 import FormWrapper from "@/components/form/FormWrapper";
 import InputField from "@/components/form/InputField";
 import PasswordField from "@/components/form/PasswordField";
