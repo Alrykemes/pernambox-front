@@ -21,8 +21,9 @@ export default function PasswordRecovery() {
       console.error(error);
     }
   };
+
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <>
       <div className="hidden lg:block lg:w-1/2">
         <img
           src={checkingStock}
@@ -88,6 +89,6 @@ export default function PasswordRecovery() {
           </FormWrapper>
         </div>
       </main>
-    </div>
+    </>
   );
 }

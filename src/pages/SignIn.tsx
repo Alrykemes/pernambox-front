@@ -21,7 +21,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <>
       <div className="flex w-full flex-col items-center justify-center lg:w-1/2">
         <LogoHeader />
         <div className="w-full max-w-md p-8">
@@ -78,6 +78,6 @@ export default function SignIn() {
           loading="lazy"
         />
       </div>
-    </div>
+    </>
   );
 }

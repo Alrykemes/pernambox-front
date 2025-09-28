@@ -1,12 +1,8 @@
-import SignIn from "@/pages/SignIn.tsx";
-import { Route, Routes } from "react-router-dom";
-import PasswordRecovery from "./pages/PasswordRecovery";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { routes } from "./routes";
+
+const router = createBrowserRouter(routes);
 
 export default function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<SignIn />} />
-      <Route path="/password-recovery" element={<PasswordRecovery />} />
-    </Routes>
-  );
+  return <RouterProvider router={router} />;
 }
