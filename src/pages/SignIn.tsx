@@ -9,12 +9,17 @@ import { Label } from "@/components/ui/label";
 import { useSignInForm } from "@/hooks/useSignInForm";
 import type { SignInType } from "@/schemas/signIn";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import api from "../lib/api";
 
 export default function SignIn() {
   const form = useSignInForm();
   const onSubmit = async (data: SignInType) => {
     try {
       console.log(data);
+      const response = await api.post("/auth/login", data);
+      console.log(response.data);
+      toast.success("Login realizado com sucesso!");
     } catch (error) {
       console.error(error);
     }
