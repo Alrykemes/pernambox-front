@@ -1,20 +1,18 @@
 import AuthLayout from "@/layouts/AuthLayout";
-import PasswordRecovery from "@/pages/PasswordRecovery";
-import SignIn from "@/pages/SignIn";
+import Login from "@/pages/Login";
+import PasswordResetNew from "@/pages/PasswordResetNew";
+import PasswordResetRequest from "@/pages/PasswordResetRequest";
+import PasswordResetVerify from "@/pages/PasswordResetVerify";
 import type { RouteObject } from "react-router-dom";
 
 export const routes: RouteObject[] = [
   {
     element: <AuthLayout />,
     children: [
-      { path: "/", element: <SignIn /> },
-      { path: "/password-recovery", element: <PasswordRecovery /> },
+      { path: "/", element: <Login /> },
+      { path: "/password-reset/request", element: <PasswordResetRequest /> },
+      { path: "/password-reset/verify", element: <PasswordResetVerify /> },
+      { path: "/password-reset/new", element: <PasswordResetNew /> },
     ],
   },
-  // {
-  //   element: <DashboardLayout sidebar={<Sidebar />} children={} />,
-  //   children: [
-  //     { path: "/dashboard", element: <Dashboard /> },
-  //   ],
-  // },
 ];

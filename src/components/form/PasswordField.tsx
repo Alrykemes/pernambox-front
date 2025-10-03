@@ -21,7 +21,6 @@ export default function PasswordField<T extends FieldValues>({
         label={label}
         type={showPassword ? "text" : type}
         placeholder={placeholder}
-        className="h-12 pr-12"
       />
 
       <div className="absolute top-8 right-0 flex items-center pr-2">
