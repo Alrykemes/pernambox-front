@@ -8,14 +8,21 @@ import PasswordField from "@/components/form/PasswordField";
 import LogoHeader from "@/components/LogoHeader";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import useLoginForm from "@/hooks/useLoginForm";
 import api from "@/lib/api";
-import type { LoginType } from "@/schemas/login";
+import { LoginSchema, type LoginType } from "@/schemas/login";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 function Login() {
-  const form = useLoginForm();
+  const form = useForm<LoginType>({
+    resolver: zodResolver(LoginSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
+    defaultValues: { email: "", password: "" },
+  });
+
   const onSubmit = async (data: LoginType) => {
     try {
       console.log(data);

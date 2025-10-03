@@ -4,12 +4,22 @@ import { AuthFormShell } from "@/components/AuthFormShell";
 import { AuthSideImage } from "@/components/AuthSideImage";
 import FormWrapper from "@/components/form/FormWrapper";
 import PasswordField from "@/components/form/PasswordField";
-import usePasswordResetNew from "@/hooks/usePasswordResetNew";
-import type { PasswordResetNewType } from "@/schemas/passwordResetNew";
+import {
+  PasswordResetNewSchema,
+  type PasswordResetNewType,
+} from "@/schemas/passwordResetNew";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
 function PasswordResetNew() {
-  const form = usePasswordResetNew();
+  const form = useForm<PasswordResetNewType>({
+    resolver: zodResolver(PasswordResetNewSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
+    defaultValues: { password: "", confirmPassword: "" },
+  });
+
   const navigate = useNavigate();
   const onSubmit = async (data: PasswordResetNewType) => {
     try {
@@ -30,20 +40,22 @@ function PasswordResetNew() {
         description="Digite sua nova senha e a confirme."
       >
         <FormWrapper form={form} onSubmit={onSubmit}>
-          <PasswordField
-            control={form.control}
-            name="password"
-            label="Senha"
-            placeholder="••••••••"
-            type="password"
-          />
-          <PasswordField
-            control={form.control}
-            name="confirmPassword"
-            label="Confirmar Senha"
-            placeholder="••••••••"
-            type="password"
-          />
+          <div className="space-y-3">
+            <PasswordField
+              control={form.control}
+              name="password"
+              label="Senha"
+              placeholder="••••••••"
+              type="password"
+            />
+            <PasswordField
+              control={form.control}
+              name="confirmPassword"
+              label="Confirmar Senha"
+              placeholder="••••••••"
+              type="password"
+            />
+          </div>
           <div className="mt-6 flex justify-between gap-4">
             <AppButton
               variant="outline"

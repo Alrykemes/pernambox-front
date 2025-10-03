@@ -1,6 +1,10 @@
 // components/form/OTPField.tsx
 import BaseFormField from "@/components/form/BaseFormField";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { cn } from "@/lib/utils";
 import type { Control, FieldValues, Path } from "react-hook-form";
 
@@ -24,17 +28,26 @@ export default function OTPField<T extends FieldValues>({
   length = 6,
 }: OTPFieldProps<T>) {
   return (
-    <BaseFormField control={control} name={name} label={label} description={description}>
+    <BaseFormField
+      control={control}
+      name={name}
+      label={label}
+      description={description}
+    >
       {(field) => (
-        <InputOTP {...field} maxLength={length} className={cn("w-full", wrapperClassName)}>
+        <InputOTP
+          {...field}
+          maxLength={length}
+          className={cn("w-full", wrapperClassName)}
+        >
           <InputOTPGroup className="flex w-full gap-3">
             {Array.from({ length }).map((_, index) => (
               <InputOTPSlot
                 key={index}
                 index={index}
                 className={cn(
-                  "flex-1 min-w-0 h-12 rounded-md border text-center text-lg",
-                  slotClassName
+                  "h-12 min-w-0 flex-1 rounded-md border text-center text-lg",
+                  slotClassName,
                 )}
               />
             ))}
