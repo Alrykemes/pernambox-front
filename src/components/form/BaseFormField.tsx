@@ -1,5 +1,6 @@
 import {
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,6 +18,7 @@ interface BaseFormFieldProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   label: string;
+  description?: string;
   children: (field: ControllerRenderProps<T>) => ReactNode;
 }
 
@@ -24,6 +26,7 @@ export default function BaseFormField<T extends FieldValues>({
   control,
   name,
   label,
+  description,
   children,
 }: BaseFormFieldProps<T>) {
   return (
@@ -34,6 +37,7 @@ export default function BaseFormField<T extends FieldValues>({
         <FormItem>
           <FormLabel htmlFor={name}>{label}</FormLabel>
           <FormControl>{children(field)}</FormControl>
+          {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
         </FormItem>
       )}

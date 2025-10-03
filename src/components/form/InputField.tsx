@@ -1,5 +1,6 @@
 import BaseFormField from "@/components/form/BaseFormField";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import type { Control, FieldValues, Path } from "react-hook-form";
 
 export interface InputFieldProps<T extends FieldValues> {
@@ -26,7 +27,7 @@ export default function InputField<T extends FieldValues>({
           id={name}
           placeholder={placeholder}
           type={type}
-          className={className}
+          className={cn("h-12", className)}
           {...field}
         />
       )}
