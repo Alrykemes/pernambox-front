@@ -4,6 +4,8 @@ import { AuthFormShell } from "@/components/AuthFormShell";
 import { AuthSideImage } from "@/components/AuthSideImage";
 import FormWrapper from "@/components/form/FormWrapper";
 import OTPField from "@/components/form/OTPField";
+import { useResetPassword } from "@/context/ResetPasswordContext";
+import api from "@/lib/api";
 import type { PasswordResetVerifyType } from "@/schemas/passwordResetVerify";
 import { PasswordResetVerifySchema } from "@/schemas/passwordResetVerify";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +15,7 @@ import { toast } from "sonner";
 
 function PasswordResetVerify() {
   const navigate = useNavigate();
+  const { setToken } = useResetPassword();
 
   const form = useForm<PasswordResetVerifyType>({
     resolver: zodResolver(PasswordResetVerifySchema),
@@ -24,7 +27,14 @@ function PasswordResetVerify() {
   const onSubmit = async (data: PasswordResetVerifyType) => {
     try {
       console.log(data);
-      toast.success("Código de verificação enviado com sucesso.");
+      const response = await api.post("/auth/password-reset/verify", { otpCode: data.pin });
+      if (response.data.success && response.data.token) {
+        toast.success("Código verificado!");
+        setToken(response.data.token);
+        navigate("/password-reset/new");
+      } else {
+        toast.error("Código inválido");
+      }
     } catch (error) {
       console.error(error);
     }

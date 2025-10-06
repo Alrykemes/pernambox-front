@@ -5,6 +5,7 @@ import { AuthSideImage } from "@/components/AuthSideImage";
 import FormWrapper from "@/components/form/FormWrapper";
 import InputField from "@/components/form/InputField";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import api from "@/lib/api";
 import {
   type PasswordResetRequestType,
   PasswordResetRequestSchema,
@@ -27,8 +28,12 @@ function PasswordResetRequest() {
 
   const onSubmit = async (data: PasswordResetRequestType) => {
     try {
+      const response = await api.post("/auth/password-reset", data);
+      console.log(response);
       console.log(data);
+      console.log(api);
       toast.success("Instruções enviadas! Verifique seu e-mail.");
+      navigate("/password-reset/verify");
     } catch (error) {
       console.error(error);
     }
@@ -84,7 +89,6 @@ function PasswordResetRequest() {
               isLoading={form.formState.isSubmitting}
               disabled={!form.formState.isValid}
               className="min-w-40 bg-orange-500 font-bold text-white hover:bg-orange-600"
-              onClick={() => navigate("/password-reset/verify")}
             >
               Continuar
             </AppButton>

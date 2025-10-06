@@ -4,6 +4,8 @@ import { AuthFormShell } from "@/components/AuthFormShell";
 import { AuthSideImage } from "@/components/AuthSideImage";
 import FormWrapper from "@/components/form/FormWrapper";
 import PasswordField from "@/components/form/PasswordField";
+import { useResetPassword } from "@/context/ResetPasswordContext";
+import api from "@/lib/api";
 import {
   PasswordResetNewSchema,
   type PasswordResetNewType,
@@ -11,8 +13,12 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 function PasswordResetNew() {
+  const { token } = useResetPassword();
+  const navigate = useNavigate();
+
   const form = useForm<PasswordResetNewType>({
     resolver: zodResolver(PasswordResetNewSchema),
     mode: "onChange",
@@ -20,10 +26,27 @@ function PasswordResetNew() {
     defaultValues: { password: "", confirmPassword: "" },
   });
 
-  const navigate = useNavigate();
   const onSubmit = async (data: PasswordResetNewType) => {
+    const { password, confirmPassword } = data;
+    if (!token) {
+      toast.error("Token de redefinição não encontrado. Recomece o processo.");
+      navigate("/password-reset/request");
+      return;
+    }
     try {
       console.log(data);
+      const response = await api.patch(
+        "/auth/password-reset",
+        {
+          password,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      console.log(response);
+      toast.success("Senha alterada com sucesso!");
+      navigate("/");
     } catch (error) {
       console.error(error);
     }
