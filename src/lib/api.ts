@@ -15,4 +15,27 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const { data } = await api.get("/auth/refresh-token", {
+          withCredentials: true,
+        });
+        const { accessToken } = data;
+        useAuthStore.getState().setAccessToken(accessToken);
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        useAuthStore.getState().logout();
+      }
+    }
+    return Promise.reject(error);
+  },
+);
+
 export default api;
