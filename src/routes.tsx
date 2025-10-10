@@ -1,4 +1,4 @@
-import AuthLayout from "@/layouts/AuthLayout";
+import AuthLayout from "@/components/layouts/AuthLayout";
 import Login from "@/pages/Login";
 import PasswordResetNew from "@/pages/PasswordResetNew";
 import PasswordResetRequest from "@/pages/PasswordResetRequest";
