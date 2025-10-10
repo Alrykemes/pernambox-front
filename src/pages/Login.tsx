@@ -2,13 +2,12 @@ import checkingStock from "@/assets/images/checking-stock.gif";
 import AppButton from "@/components/AppButton";
 import { AuthFormShell } from "@/components/AuthFormShell";
 import { AuthSideImage } from "@/components/AuthSideImage";
+import CheckboxField from "@/components/form/CheckBoxField";
 import FormWrapper from "@/components/form/FormWrapper";
 import InputField from "@/components/form/InputField";
 import PasswordField from "@/components/form/PasswordField";
 import LogoHeader from "@/components/LogoHeader";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import api from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
 import { LoginSchema, type LoginType } from "@/schemas/login";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -16,18 +15,18 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 function Login() {
+  const { login } = useAuthStore();
+
   const form = useForm<LoginType>({
     resolver: zodResolver(LoginSchema),
     mode: "onChange",
     reValidateMode: "onChange",
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: "", password: "", rememberMe: false },
   });
 
   const onSubmit = async (data: LoginType) => {
     try {
-      console.log(data);
-      const response = await api.post("/auth/login", data);
-      console.log(response.data);
+      await login(data.email, data.password, data.rememberMe ?? false);
       toast.success("Login realizado com sucesso!");
     } catch (error) {
       console.error(error);
@@ -61,20 +60,17 @@ function Login() {
             />
           </div>
           <div className="mt-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <Checkbox id="remember" className="mr-2" />
-              <Label htmlFor="remember" className="text-sm">
-                Lembrar-me
-              </Label>
-            </div>
-            <div>
-              <Link
-                to="/password-reset/request"
-                className="ml-4 text-sm text-orange-500 hover:underline"
-              >
-                Esqueceu sua senha?
-              </Link>
-            </div>
+            <CheckboxField
+              control={form.control}
+              name="rememberMe"
+              label="Lembrar-me"
+            />
+            <Link
+              to="/password-reset/request"
+              className="translate-y-0.5 text-sm text-orange-500 hover:underline"
+            >
+              Esqueceu sua senha?
+            </Link>
           </div>
           <AppButton
             type="submit"
