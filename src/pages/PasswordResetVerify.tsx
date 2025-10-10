@@ -4,7 +4,7 @@ import { AuthFormShell } from "@/components/AuthFormShell";
 import { AuthSideImage } from "@/components/AuthSideImage";
 import FormWrapper from "@/components/form/FormWrapper";
 import OTPField from "@/components/form/OTPField";
-import { useResetPassword } from "@/context/ResetPasswordContext";
+import { useResetPassword } from "@/hooks/useResetPassword";
 import api from "@/lib/api";
 import type { PasswordResetVerifyType } from "@/schemas/passwordResetVerify";
 import { PasswordResetVerifySchema } from "@/schemas/passwordResetVerify";
@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 function PasswordResetVerify() {
+  const { userId } = useResetPassword();
   const navigate = useNavigate();
   const { setToken } = useResetPassword();
 
@@ -26,9 +27,13 @@ function PasswordResetVerify() {
 
   const onSubmit = async (data: PasswordResetVerifyType) => {
     try {
-      console.log(data);
-      const response = await api.post("/auth/password-reset/verify", { otpCode: data.pin });
+      const response = await api.post("/auth/password-reset/validate-otp", {
+        otpCode: data.pin,
+        userId,
+      });
+
       if (response.data.success && response.data.token) {
+        alert("Código verificado!");
         toast.success("Código verificado!");
         setToken(response.data.token);
         navigate("/password-reset/new");

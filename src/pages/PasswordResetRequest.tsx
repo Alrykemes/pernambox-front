@@ -5,6 +5,7 @@ import { AuthSideImage } from "@/components/AuthSideImage";
 import FormWrapper from "@/components/form/FormWrapper";
 import InputField from "@/components/form/InputField";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useResetPassword } from "@/hooks/useResetPassword";
 import api from "@/lib/api";
 import {
   type PasswordResetRequestType,
@@ -17,6 +18,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 function PasswordResetRequest() {
+  const { setUserId } = useResetPassword();
+
   const navigate = useNavigate();
 
   const form = useForm<PasswordResetRequestType>({
@@ -29,10 +32,11 @@ function PasswordResetRequest() {
   const onSubmit = async (data: PasswordResetRequestType) => {
     try {
       const response = await api.post("/auth/password-reset", data);
-      console.log(response);
-      console.log(data);
-      console.log(api);
+
+      setUserId(response.data.userId);
+      console.log(response.data.userId);
       toast.success("Instruções enviadas! Verifique seu e-mail.");
+
       navigate("/password-reset/verify");
     } catch (error) {
       console.error(error);

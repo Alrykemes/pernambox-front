@@ -4,7 +4,7 @@ import { AuthFormShell } from "@/components/AuthFormShell";
 import { AuthSideImage } from "@/components/AuthSideImage";
 import FormWrapper from "@/components/form/FormWrapper";
 import PasswordField from "@/components/form/PasswordField";
-import { useResetPassword } from "@/context/ResetPasswordContext";
+import { useResetPassword } from "@/hooks/useResetPassword";
 import api from "@/lib/api";
 import {
   PasswordResetNewSchema,
