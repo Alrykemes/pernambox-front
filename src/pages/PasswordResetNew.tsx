@@ -26,6 +26,8 @@ function PasswordResetNew() {
     defaultValues: { password: "", confirmPassword: "" },
   });
 
+  if (!token) navigate("/password-reset/request");
+
   const onSubmit = async (data: PasswordResetNewType) => {
     const { password, confirmPassword } = data;
     if (!token) {

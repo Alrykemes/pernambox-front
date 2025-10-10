@@ -25,6 +25,8 @@ function PasswordResetVerify() {
     defaultValues: { pin: "" },
   });
 
+  if (!userId) navigate("/password-reset/request");
+
   const onSubmit = async (data: PasswordResetVerifyType) => {
     try {
       const response = await api.post("/auth/password-reset/validate-otp", {
@@ -33,7 +35,6 @@ function PasswordResetVerify() {
       });
 
       if (response.data.success && response.data.token) {
-        alert("Código verificado!");
         toast.success("Código verificado!");
         setToken(response.data.token);
         navigate("/password-reset/new");

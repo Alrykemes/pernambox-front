@@ -7,8 +7,8 @@ import FormWrapper from "@/components/form/FormWrapper";
 import InputField from "@/components/form/InputField";
 import PasswordField from "@/components/form/PasswordField";
 import LogoHeader from "@/components/LogoHeader";
-import { useAuthStore } from "@/store/authStore";
 import { LoginSchema, type LoginType } from "@/schemas/login";
+import { useAuthStore } from "@/store/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
@@ -29,6 +29,7 @@ function Login() {
       await login(data.email, data.password, data.rememberMe ?? false);
       toast.success("Login realizado com sucesso!");
     } catch (error) {
+      toast.error("Erro ao fazer login. Verifique suas credenciais.");
       console.error(error);
     }
   };
