@@ -17,7 +17,7 @@ import type {
 interface BaseFormFieldProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
-  label: string;
+  label?: string;
   description?: string;
   children: (field: ControllerRenderProps<T>) => ReactNode;
 }

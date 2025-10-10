@@ -15,7 +15,7 @@ export function AuthSideImage({
         src={src}
         alt={alt}
         loading="lazy"
-        className={cn("h-110 w-110 object-contain", className)}
+        className={cn("h-125 w-125 object-contain", className)}
       />
     </div>
   );
