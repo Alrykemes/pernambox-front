@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/stores/authStore";
 import axios from "axios";
 
 const api = axios.create({
@@ -30,8 +30,9 @@ api.interceptors.response.use(
         useAuthStore.getState().setAccessToken(accessToken);
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
-      } catch (refreshError) {
+      } catch (err) {
         useAuthStore.getState().logout();
+        console.error("Refresh token failed:", err);
       }
     }
     return Promise.reject(error);
