@@ -4,44 +4,45 @@ import { AuthFormShell } from "@/components/AuthFormShell";
 import { AuthSideImage } from "@/components/AuthSideImage";
 import FormWrapper from "@/components/form/FormWrapper";
 import OTPField from "@/components/form/OTPField";
-import { useResetPassword } from "@/hooks/useResetPassword";
 import api from "@/lib/api";
-import type { PasswordResetVerifyType } from "@/schemas/passwordResetVerify";
-import { PasswordResetVerifySchema } from "@/schemas/passwordResetVerify";
+import type { VerifyCodeType } from "@/schemas/password-reset/verifyCode";
+import { VerifyCodeSchema } from "@/schemas/password-reset/verifyCode";
+import { useResetPasswordStore } from "@/stores/resetPasswordStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-function PasswordResetVerify() {
-  const { userId } = useResetPassword();
+function VerifyCode() {
   const navigate = useNavigate();
-  const { setToken } = useResetPassword();
 
-  const form = useForm<PasswordResetVerifyType>({
-    resolver: zodResolver(PasswordResetVerifySchema),
+  const { userId, setToken } = useResetPasswordStore();
+
+  const form = useForm<VerifyCodeType>({
+    resolver: zodResolver(VerifyCodeSchema),
     mode: "onChange",
     reValidateMode: "onChange",
-    defaultValues: { pin: "" },
+    defaultValues: { otpCode: "" },
   });
 
-  if (!userId) navigate("/password-reset/request");
+  if (!userId) navigate("/recuperar-senha");
 
-  const onSubmit = async (data: PasswordResetVerifyType) => {
+  const onSubmit = async (data: VerifyCodeType) => {
     try {
       const response = await api.post("/auth/password-reset/validate-otp", {
-        otpCode: data.pin,
+        otpCode: data.otpCode,
         userId,
       });
 
       if (response.data.success && response.data.token) {
-        toast.success("Código verificado!");
         setToken(response.data.token);
-        navigate("/password-reset/new");
+        toast.success("Código verificado!");
+        navigate("/recuperar-senha/nova");
       } else {
-        toast.error("Código inválido");
+        toast.error("Código inválido!");
       }
     } catch (error) {
+      toast.error("Erro ao verificar código. Tente novamente.");
       console.error(error);
     }
   };
@@ -56,14 +57,14 @@ function PasswordResetVerify() {
         <FormWrapper form={form} onSubmit={onSubmit}>
           <OTPField
             control={form.control}
-            name="pin"
+            name="otpCode"
             label="Código de Verificação"
           />
           <div className="mt-6 flex justify-between gap-4">
             <AppButton
               variant="outline"
               disabled={form.formState.isSubmitting}
-              onClick={() => navigate("/password-reset/request")}
+              onClick={() => navigate("/recuperar-senha")}
               className="bg-white px-12 font-bold text-black hover:bg-blue-700/90 hover:text-white"
             >
               Voltar
@@ -74,7 +75,7 @@ function PasswordResetVerify() {
               isLoading={form.formState.isSubmitting}
               disabled={!form.formState.isValid}
               className="min-w-40 bg-orange-500 font-bold text-white hover:bg-orange-600"
-              onClick={() => navigate("/password-reset/new")}
+              onClick={() => navigate("/recuperar-senha/nova")}
             >
               Verificar
             </AppButton>
@@ -85,4 +86,4 @@ function PasswordResetVerify() {
   );
 }
 
-export default PasswordResetVerify;
+export default VerifyCode;

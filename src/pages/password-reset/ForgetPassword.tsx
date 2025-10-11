@@ -5,40 +5,40 @@ import { AuthSideImage } from "@/components/AuthSideImage";
 import FormWrapper from "@/components/form/FormWrapper";
 import InputField from "@/components/form/InputField";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useResetPassword } from "@/hooks/useResetPassword";
 import api from "@/lib/api";
 import {
-  type PasswordResetRequestType,
-  PasswordResetRequestSchema,
-} from "@/schemas/passwordResetRequest";
+  type ForgetPasswordType,
+  ForgetPasswordSchema,
+} from "@/schemas/password-reset/forgetPassword";
+import { useResetPasswordStore } from "@/stores/resetPasswordStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Info } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-function PasswordResetRequest() {
-  const { setUserId } = useResetPassword();
-
+function ForgetPassword() {
   const navigate = useNavigate();
 
-  const form = useForm<PasswordResetRequestType>({
-    resolver: zodResolver(PasswordResetRequestSchema),
+  const { setUserId } = useResetPasswordStore();
+
+  const form = useForm<ForgetPasswordType>({
+    resolver: zodResolver(ForgetPasswordSchema),
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: { email: "" },
   });
 
-  const onSubmit = async (data: PasswordResetRequestType) => {
+  const onSubmit = async (data: ForgetPasswordType) => {
     try {
       const response = await api.post("/auth/password-reset", data);
-
-      setUserId(response.data.userId);
-      console.log(response.data.userId);
-      toast.success("Instruções enviadas! Verifique seu e-mail.");
-
-      navigate("/password-reset/verify");
+      if (response.data.success) {
+        setUserId(response.data.userId);
+        toast.success("Instruções enviadas! Verifique seu e-mail.");
+        navigate("/recuperar-senha/verificar");
+      }
     } catch (error) {
+      toast.error("Erro ao enviar instruções. Tente novamente.");
       console.error(error);
     }
   };
@@ -103,4 +103,4 @@ function PasswordResetRequest() {
   );
 }
 
-export default PasswordResetRequest;
+export default ForgetPassword;

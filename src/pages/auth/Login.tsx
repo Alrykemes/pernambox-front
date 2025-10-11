@@ -7,8 +7,8 @@ import FormWrapper from "@/components/form/FormWrapper";
 import InputField from "@/components/form/InputField";
 import PasswordField from "@/components/form/PasswordField";
 import LogoHeader from "@/components/LogoHeader";
-import { LoginSchema, type LoginType } from "@/schemas/login";
-import { useAuthStore } from "@/store/authStore";
+import { LoginSchema, type LoginType } from "@/schemas/auth/login";
+import { useAuthStore } from "@/stores/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
@@ -26,10 +26,16 @@ function Login() {
 
   const onSubmit = async (data: LoginType) => {
     try {
-      await login(data.email, data.password, data.rememberMe ?? false);
+      await login({
+        email: data.email,
+        password: data.password,
+        rememberMe: data.rememberMe ?? false,
+      });
       toast.success("Login realizado com sucesso!");
     } catch (error) {
-      toast.error("Erro ao fazer login. Verifique suas credenciais.");
+      toast.error(
+        "Erro ao fazer login. Verifique suas credenciais e tente novamente.",
+      );
       console.error(error);
     }
   };
@@ -67,7 +73,7 @@ function Login() {
               label="Lembrar-me"
             />
             <Link
-              to="/password-reset/request"
+              to="/recuperar-senha"
               className="translate-y-0.5 text-sm text-orange-500 hover:underline"
             >
               Esqueceu sua senha?

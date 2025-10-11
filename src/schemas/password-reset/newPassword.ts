@@ -1,6 +1,6 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 
-export const PasswordResetNewSchema = z
+export const NewPasswordSchema = z
   .object({
     password: z.string().min(8, "A senha precisa ter no mínimo 8 caracteres."),
     confirmPassword: z
@@ -12,4 +12,4 @@ export const PasswordResetNewSchema = z
     path: ["confirmPassword"],
   });
 
-export type PasswordResetNewType = z.infer<typeof PasswordResetNewSchema>;
+export type NewPasswordType = z.infer<typeof NewPasswordSchema>;

@@ -4,39 +4,34 @@ import { AuthFormShell } from "@/components/AuthFormShell";
 import { AuthSideImage } from "@/components/AuthSideImage";
 import FormWrapper from "@/components/form/FormWrapper";
 import PasswordField from "@/components/form/PasswordField";
-import { useResetPassword } from "@/hooks/useResetPassword";
 import api from "@/lib/api";
 import {
-  PasswordResetNewSchema,
-  type PasswordResetNewType,
-} from "@/schemas/passwordResetNew";
+  NewPasswordSchema,
+  type NewPasswordType,
+} from "@/schemas/password-reset/newPassword";
+import { useResetPasswordStore } from "@/stores/resetPasswordStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-function PasswordResetNew() {
-  const { token } = useResetPassword();
+function NewPassword() {
   const navigate = useNavigate();
 
-  const form = useForm<PasswordResetNewType>({
-    resolver: zodResolver(PasswordResetNewSchema),
+  const { token } = useResetPasswordStore();
+
+  const form = useForm<NewPasswordType>({
+    resolver: zodResolver(NewPasswordSchema),
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: { password: "", confirmPassword: "" },
   });
 
-  if (!token) navigate("/password-reset/request");
+  if (!token) navigate("/recuperar-senha");
 
-  const onSubmit = async (data: PasswordResetNewType) => {
-    const { password, confirmPassword } = data;
-    if (!token) {
-      toast.error("Token de redefinição não encontrado. Recomece o processo.");
-      navigate("/password-reset/request");
-      return;
-    }
+  const onSubmit = async (data: NewPasswordType) => {
+    const { password } = data;
     try {
-      console.log(data);
       const response = await api.patch(
         "/auth/password-reset",
         {
@@ -46,10 +41,13 @@ function PasswordResetNew() {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      console.log(response);
-      toast.success("Senha alterada com sucesso!");
-      navigate("/");
+      if (response.data.success) {
+        toast.success("Senha alterada com sucesso!");
+        navigate("/");
+      }
+      console.log(response.data.message);
     } catch (error) {
+      toast.error("Erro ao alterar senha. Tente novamente.");
       console.error(error);
     }
   };
@@ -96,7 +94,6 @@ function PasswordResetNew() {
               isLoading={form.formState.isSubmitting}
               disabled={!form.formState.isValid}
               className="min-w-40 bg-orange-500 font-bold text-white hover:bg-orange-600"
-              onClick={() => navigate("/")}
             >
               Confirmar
             </AppButton>
@@ -107,4 +104,4 @@ function PasswordResetNew() {
   );
 }
 
-export default PasswordResetNew;
+export default NewPassword;

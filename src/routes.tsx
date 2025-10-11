@@ -1,8 +1,8 @@
 import AuthLayout from "@/components/layouts/AuthLayout";
-import Login from "@/pages/Login";
-import PasswordResetNew from "@/pages/PasswordResetNew";
-import PasswordResetRequest from "@/pages/PasswordResetRequest";
-import PasswordResetVerify from "@/pages/PasswordResetVerify";
+import Login from "@/pages/auth/Login";
+import ForgetPassword from "@/pages/password-reset/ForgetPassword";
+import NewPassword from "@/pages/password-reset/NewPassword";
+import VerifyCode from "@/pages/password-reset/VerifyCode";
 import type { RouteObject } from "react-router-dom";
 
 export const routes: RouteObject[] = [
@@ -10,9 +10,9 @@ export const routes: RouteObject[] = [
     element: <AuthLayout />,
     children: [
       { path: "/", element: <Login /> },
-      { path: "/password-reset/request", element: <PasswordResetRequest /> },
-      { path: "/password-reset/verify", element: <PasswordResetVerify /> },
-      { path: "/password-reset/new", element: <PasswordResetNew /> },
+      { path: "/recuperar-senha", element: <ForgetPassword /> },
+      { path: "/recuperar-senha/verificar", element: <VerifyCode /> },
+      { path: "/recuperar-senha/nova", element: <NewPassword /> },
     ],
   },
 ];

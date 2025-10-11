@@ -1,18 +1,14 @@
 import api from "@/lib/api";
+import type { LoginType } from "@/schemas/auth/login";
+import type { User } from "@/types/user";
 import { create } from "zustand";
-
-type User = {
-  id: string;
-  email: string;
-  role: string;
-};
 
 type AuthState = {
   user: User | null;
-  accessToken: string | null;
-  login: (email: string, password: string, rememberMe: boolean) => Promise<void>;
-  logout: () => void;
   fetchUser: () => Promise<void>;
+  login: (data: LoginType) => Promise<void>;
+  logout: () => void;
+  accessToken: string | null;
   setAccessToken: (token: string) => void;
 };
 
@@ -21,11 +17,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   accessToken: null,
   loading: false,
 
-  login: async (email, password, rememberMe) => {
+  login: async (data: LoginType) => {
     try {
-      const { data } = await api.post("/auth/login", { email, password, rememberMe });
-      set({ user: data.user, accessToken: data.accessToken });
+      const { data: response } = await api.post("/auth/login", data);
+      set({ user: response.user, accessToken: response.accessToken });
     } catch (error) {
+      console.error("Login failed:", error);
       throw error;
     }
   },
