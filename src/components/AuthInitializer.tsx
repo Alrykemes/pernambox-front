@@ -1,5 +1,5 @@
 import api from "@/lib/api";
-import { useAuthStore } from "@/stores/authStore";
+import { useAuthStore } from "@/stores/auth-store";
 import { useEffect } from "react";
 
 export function AuthInitializer({ children }: { children: React.ReactNode }) {
