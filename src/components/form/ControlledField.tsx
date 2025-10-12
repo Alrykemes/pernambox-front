@@ -14,29 +14,33 @@ import type {
   Path,
 } from "react-hook-form";
 
-interface BaseFormFieldProps<T extends FieldValues> {
+interface ControlledFieldProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
+  id?: string;
   label?: string;
   description?: string;
-  children: (field: ControllerRenderProps<T>) => ReactNode;
+  children: (field: ControllerRenderProps<T> & { id: string }) => ReactNode;
 }
 
-export default function BaseFormField<T extends FieldValues>({
+export function ControlledField<T extends FieldValues>({
   control,
   name,
+  id,
   label,
   description,
   children,
-}: BaseFormFieldProps<T>) {
+}: ControlledFieldProps<T>) {
+  const fieldId = id ?? name;
+
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel htmlFor={name}>{label}</FormLabel>
-          <FormControl>{children(field)}</FormControl>
+          {label && <FormLabel htmlFor={fieldId}>{label}</FormLabel>}
+          <FormControl>{children({ ...field, id: fieldId })}</FormControl>
           {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
         </FormItem>

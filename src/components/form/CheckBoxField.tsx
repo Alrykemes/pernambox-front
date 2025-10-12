@@ -1,4 +1,4 @@
-import BaseFormField from "@/components/form/BaseFormField";
+import { ControlledField } from "@/components/form/ControlledField";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -11,14 +11,14 @@ export interface CheckboxFieldProps<T extends FieldValues> {
   className?: string;
 }
 
-export default function CheckboxField<T extends FieldValues>({
+export function CheckboxField<T extends FieldValues>({
   control,
   name,
   label,
   className,
 }: CheckboxFieldProps<T>) {
   return (
-    <BaseFormField control={control} name={name}>
+    <ControlledField control={control} name={name}>
       {(field) => (
         <div className={cn("flex items-center space-x-2", className)}>
           <Checkbox
@@ -31,6 +31,6 @@ export default function CheckboxField<T extends FieldValues>({
           </Label>
         </div>
       )}
-    </BaseFormField>
+    </ControlledField>
   );
 }

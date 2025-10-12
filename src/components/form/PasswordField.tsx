@@ -1,27 +1,33 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import type { FieldValues } from "react-hook-form";
-import InputField, { type InputFieldProps } from "./InputField";
+import { Input } from "../ui/input";
+import { ControlledField } from "./ControlledField";
+import { type InputFieldProps } from "./InputField";
 
 export default function PasswordField<T extends FieldValues>({
   control,
   name,
   label = "Senha",
   placeholder = "••••••••",
-  type = "password",
+  className,
 }: InputFieldProps<T>) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="relative h-12 pb-24">
-      <InputField
-        control={control}
-        name={name}
-        label={label}
-        type={showPassword ? "text" : type}
-        placeholder={placeholder}
-      />
+      <ControlledField control={control} name={name} label={label}>
+        {(field) => (
+          <Input
+            {...field}
+            placeholder={placeholder}
+            type={showPassword ? "text" : "password"}
+            className={cn("h-12", className)}
+          />
+        )}
+      </ControlledField>
 
       <div className="absolute top-8 right-0 flex items-center pr-2">
         <Button

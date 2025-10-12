@@ -1,4 +1,4 @@
-import BaseFormField from "@/components/form/BaseFormField";
+import { ControlledField } from "@/components/form/ControlledField";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { Control, FieldValues, Path } from "react-hook-form";
@@ -12,7 +12,7 @@ export interface InputFieldProps<T extends FieldValues> {
   className?: string;
 }
 
-export default function InputField<T extends FieldValues>({
+export function InputField<T extends FieldValues>({
   control,
   name,
   label,
@@ -21,16 +21,15 @@ export default function InputField<T extends FieldValues>({
   className,
 }: InputFieldProps<T>) {
   return (
-    <BaseFormField control={control} name={name} label={label}>
+    <ControlledField control={control} name={name} label={label}>
       {(field) => (
         <Input
-          id={name}
           placeholder={placeholder}
           type={type}
           className={cn("h-12", className)}
           {...field}
         />
       )}
-    </BaseFormField>
+    </ControlledField>
   );
 }

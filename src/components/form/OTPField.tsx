@@ -1,5 +1,4 @@
-// components/form/OTPField.tsx
-import BaseFormField from "@/components/form/BaseFormField";
+import { ControlledField } from "@/components/form/ControlledField";
 import {
   InputOTP,
   InputOTPGroup,
@@ -28,7 +27,7 @@ export default function OTPField<T extends FieldValues>({
   length = 6,
 }: OTPFieldProps<T>) {
   return (
-    <BaseFormField
+    <ControlledField
       control={control}
       name={name}
       label={label}
@@ -54,6 +53,6 @@ export default function OTPField<T extends FieldValues>({
           </InputOTPGroup>
         </InputOTP>
       )}
-    </BaseFormField>
+    </ControlledField>
   );
 }

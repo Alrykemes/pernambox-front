@@ -5,19 +5,19 @@ import type {
   UseFormReturn,
 } from "react-hook-form";
 
-interface FormWrapperProps<T extends FieldValues> {
+interface HookFormProviderProps<T extends FieldValues> {
   form: UseFormReturn<T>;
   onSubmit: SubmitHandler<T>;
   children: React.ReactNode;
   className?: string;
 }
 
-export default function FormWrapper<T extends FieldValues>({
+export function HookFormProvider<T extends FieldValues>({
   form,
   onSubmit,
   children,
   className,
-}: FormWrapperProps<T>) {
+}: HookFormProviderProps<T>) {
   return (
     <Form {...form}>
       <form
