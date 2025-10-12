@@ -1,10 +1,7 @@
-import checkingStock from "@/assets/images/checking-stock.gif";
 import AppButton from "@/components/AppButton";
-import { AuthFormShell } from "@/components/AuthFormShell";
-import { AuthSideImage } from "@/components/AuthSideImage";
-import CheckboxField from "@/components/form/CheckBoxField";
-import FormWrapper from "@/components/form/FormWrapper";
-import InputField from "@/components/form/InputField";
+import { CheckboxField } from "@/components/form/CheckBoxField";
+import { HookFormProvider } from "@/components/form/HookFormProvider";
+import { InputField } from "@/components/form/InputField";
 import PasswordField from "@/components/form/PasswordField";
 import LogoHeader from "@/components/LogoHeader";
 import { LoginSchema, type LoginType } from "@/schemas/auth/login";
@@ -42,54 +39,48 @@ function Login() {
 
   return (
     <>
-      <AuthSideImage
-        src={checkingStock}
-        alt="gif: personagem verificando estoque"
-      />
-      <AuthFormShell>
-        <LogoHeader />
-        <FormWrapper form={form} onSubmit={onSubmit}>
-          <div className="space-y-4">
-            <InputField
-              control={form.control}
-              name="email"
-              label="E-mail"
-              placeholder="john.doe@example.com"
-              type="email"
-            />
+      <LogoHeader />
+      <HookFormProvider form={form} onSubmit={onSubmit}>
+        <div className="space-y-4">
+          <InputField
+            control={form.control}
+            name="email"
+            label="E-mail"
+            placeholder="john.doe@example.com"
+            type="email"
+          />
 
-            <PasswordField
-              control={form.control}
-              name="password"
-              label="Senha"
-              placeholder="••••••••"
-              type="password"
-            />
-          </div>
-          <div className="mt-4 flex items-center justify-between">
-            <CheckboxField
-              control={form.control}
-              name="rememberMe"
-              label="Lembrar-me"
-            />
-            <Link
-              to="/recuperar-senha"
-              className="translate-y-0.5 text-sm text-orange-500 hover:underline"
-            >
-              Esqueceu sua senha?
-            </Link>
-          </div>
-          <AppButton
-            type="submit"
-            isLoading={form.formState.isSubmitting}
-            disabled={!form.formState.isValid}
-            className="mt-6 h-12 w-full bg-orange-500 font-bold text-white hover:bg-orange-600"
-            aria-label="botão de entrar no sistema"
+          <PasswordField
+            control={form.control}
+            name="password"
+            label="Senha"
+            placeholder="••••••••"
+            type="password"
+          />
+        </div>
+        <div className="mt-4 flex items-center justify-between">
+          <CheckboxField
+            control={form.control}
+            name="rememberMe"
+            label="Lembrar-me"
+          />
+          <Link
+            to="/recuperar-senha"
+            className="translate-y-0.5 text-sm text-orange-500 hover:underline"
           >
-            Entrar
-          </AppButton>
-        </FormWrapper>
-      </AuthFormShell>
+            Esqueceu sua senha?
+          </Link>
+        </div>
+        <AppButton
+          type="submit"
+          isLoading={form.formState.isSubmitting}
+          disabled={!form.formState.isValid}
+          className="mt-6 h-12 w-full bg-orange-500 font-bold text-white hover:bg-orange-600"
+          aria-label="botão de entrar no sistema"
+        >
+          Entrar
+        </AppButton>
+      </HookFormProvider>
     </>
   );
 }
