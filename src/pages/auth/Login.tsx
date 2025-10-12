@@ -5,7 +5,7 @@ import { InputField } from "@/components/form/InputField";
 import PasswordField from "@/components/form/PasswordField";
 import LogoHeader from "@/components/LogoHeader";
 import { LoginSchema, type LoginType } from "@/schemas/auth/login";
-import { useAuthStore } from "@/stores/authStore";
+import { useAuthStore } from "@/stores/auth-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";

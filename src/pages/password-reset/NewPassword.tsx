@@ -5,8 +5,8 @@ import api from "@/lib/api";
 import {
   NewPasswordSchema,
   type NewPasswordType,
-} from "@/schemas/password-reset/newPassword";
-import { useResetPasswordStore } from "@/stores/resetPasswordStore";
+} from "@/schemas/password-reset/new-password";
+import { useResetPasswordStore } from "@/stores/reset-password-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
