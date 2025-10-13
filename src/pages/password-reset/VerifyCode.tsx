@@ -2,16 +2,16 @@ import AppButton from "@/components/AppButton";
 import { HookFormProvider } from "@/components/form/HookFormProvider";
 import OTPField from "@/components/form/OTPField";
 import api from "@/lib/api";
-import type { VerifyCodeType } from "@/schemas/password-reset/verifyCode";
-import { VerifyCodeSchema } from "@/schemas/password-reset/verifyCode";
-import { useResetPasswordStore } from "@/stores/resetPasswordStore";
+import type { VerifyCodeType } from "@/schemas/password-reset/verify-code";
+import { VerifyCodeSchema } from "@/schemas/password-reset/verify-code";
+import { useResetPasswordStore } from "@/stores/reset-password-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-function VerifyCode() {
+export default function VerifyCode() {
   const navigate = useNavigate();
 
   const { userId, setToken } = useResetPasswordStore();
@@ -79,5 +79,3 @@ function VerifyCode() {
     </>
   );
 }
-
-export default VerifyCode;

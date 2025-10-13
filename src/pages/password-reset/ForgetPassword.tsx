@@ -6,15 +6,15 @@ import api from "@/lib/api";
 import {
   type ForgetPasswordType,
   ForgetPasswordSchema,
-} from "@/schemas/password-reset/forgetPassword";
-import { useResetPasswordStore } from "@/stores/resetPasswordStore";
+} from "@/schemas/password-reset/forget-password";
+import { useResetPasswordStore } from "@/stores/reset-password-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Info } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-function ForgetPassword() {
+export default function ForgetPassword() {
   const navigate = useNavigate();
 
   const { setUserId } = useResetPasswordStore();
@@ -88,5 +88,3 @@ function ForgetPassword() {
     </>
   );
 }
-
-export default ForgetPassword;

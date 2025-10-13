@@ -3,15 +3,15 @@ import { CheckboxField } from "@/components/form/CheckBoxField";
 import { HookFormProvider } from "@/components/form/HookFormProvider";
 import { InputField } from "@/components/form/InputField";
 import PasswordField from "@/components/form/PasswordField";
-import LogoHeader from "@/components/LogoHeader";
+import Logo from "@/components/Logo";
 import { LoginSchema, type LoginType } from "@/schemas/auth/login";
-import { useAuthStore } from "@/stores/authStore";
+import { useAuthStore } from "@/stores/auth-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
-function Login() {
+export default function Login() {
   const { login } = useAuthStore();
 
   const form = useForm<LoginType>({
@@ -39,7 +39,7 @@ function Login() {
 
   return (
     <>
-      <LogoHeader />
+      <Logo />
       <HookFormProvider form={form} onSubmit={onSubmit}>
         <div className="space-y-4">
           <InputField
@@ -84,5 +84,3 @@ function Login() {
     </>
   );
 }
-
-export default Login;

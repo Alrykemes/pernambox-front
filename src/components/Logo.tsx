@@ -1,7 +1,7 @@
 import logo from "@/assets/images/logo.png";
 import { Link } from "react-router-dom";
 
-export default function LogoHeader() {
+export default function Logo() {
   return (
     <div className="flex flex-col items-center pb-24">
       <Link to="/" className="mb-2 flex items-center space-x-2">
