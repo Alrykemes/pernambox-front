@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-function VerifyCode() {
+export default function VerifyCode() {
   const navigate = useNavigate();
 
   const { userId, setToken } = useResetPasswordStore();
@@ -79,5 +79,3 @@ function VerifyCode() {
     </>
   );
 }
-
-export default VerifyCode;

@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-function NewPassword() {
+export default function NewPassword() {
   const navigate = useNavigate();
 
   const { token } = useResetPasswordStore();
@@ -92,5 +92,3 @@ function NewPassword() {
     </>
   );
 }
-
-export default NewPassword;

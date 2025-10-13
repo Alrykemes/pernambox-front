@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-function ForgetPassword() {
+export default function ForgetPassword() {
   const navigate = useNavigate();
 
   const { setUserId } = useResetPasswordStore();
@@ -88,5 +88,3 @@ function ForgetPassword() {
     </>
   );
 }
-
-export default ForgetPassword;
