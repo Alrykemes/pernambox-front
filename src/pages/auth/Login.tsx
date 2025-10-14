@@ -8,11 +8,12 @@ import { LoginSchema, type LoginType } from "@/schemas/auth/login";
 import { useAuthStore } from "@/stores/auth-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function Login() {
   const { login } = useAuthStore();
+  const navigate = useNavigate();
 
   const form = useForm<LoginType>({
     resolver: zodResolver(LoginSchema),
@@ -29,6 +30,7 @@ export default function Login() {
         rememberMe: data.rememberMe ?? false,
       });
       toast.success("Login realizado com sucesso!");
+      navigate("/dashboard")
     } catch (error) {
       toast.error(
         "Erro ao fazer login. Verifique suas credenciais e tente novamente.",

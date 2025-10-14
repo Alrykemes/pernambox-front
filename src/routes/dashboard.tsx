@@ -1,4 +1,4 @@
-import Home from "../pages/dasboard/Home";
+import Home from "../pages/dashboard/Home";
 
 export const dashboard = [
   {
