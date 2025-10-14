@@ -16,6 +16,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useAuthStore } from "@/stores/auth-store";
+import { useNavigate } from "react-router-dom";
 
 interface UserMenuProps {
   user: {
@@ -27,6 +29,8 @@ interface UserMenuProps {
 
 export function UserMenu({ user }: UserMenuProps) {
   const { isMobile } = useSidebar();
+  const navigate = useNavigate();
+  const { logout } = useAuthStore();
 
   const getInitials = (name: string) => {
     const names = name.split(" ").slice(0, 2);
@@ -88,13 +92,16 @@ export function UserMenu({ user }: UserMenuProps) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {
+              logout();
+              navigate("/");
+            }}>
               <LogOut />
               Sair
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
-    </SidebarMenu>
+    </SidebarMenu >
   );
 }
