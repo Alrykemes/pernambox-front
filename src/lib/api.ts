@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/stores/auth-store";
 import axios from "axios";
+import { toast } from "sonner";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -19,8 +20,13 @@ api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const originalRequest = error.config;
+    const status = error.response?.status;
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      "Um erro inesperado ocorreu";
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         const { data } = await api.get("/auth/refresh-token", {
@@ -32,9 +38,13 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         useAuthStore.getState().logout();
-        console.error("Refresh token failed:", err);
       }
+    } else if (status === 500) {
+      toast.error("Erro interno do servidor: " + message);
+    } else {
+      console.log("Erro: " + message);
     }
+
     return Promise.reject(error);
   },
 );
