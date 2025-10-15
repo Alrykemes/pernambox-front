@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Edit2, Trash2, MapPin, Users, Package, ChevronLeft, ChevronRight, Settings} from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, MapPin, Users, Package, ChevronLeft, ChevronRight, Settings, LayoutDashboard, PackageSearch, House} from 'lucide-react';
 
 
 interface Unit {
@@ -99,15 +99,15 @@ const UnitsManagement = () => {
           <div className="text-xs text-gray-500 mb-2 font-semibold">MENU PRINCIPAL</div>
           <nav className="space-y-1">
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">
-              <MapPin size={18} />
+              <LayoutDashboard size={18} />
               <span>Dashboard</span>
             </a>
             <a href="#" className="flex items-center gap-3 px-3 py-2 bg-blue-50 text-blue-600 rounded font-medium">
-              <MapPin size={18} />
+              <House size={18} />
               <span>Unidades</span>
             </a>
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">
-              <Package size={18} />
+              <PackageSearch size={18} />
               <span>Produtos</span>
             </a>
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">
@@ -269,7 +269,7 @@ const UnitsManagement = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t">
+                  <div className="flex flex-wrap items-center justify-between">
                     <div className="flex gap-4">
                       <div className="flex items-center gap-1 text-sm text-gray-600">
                         <Package size={16} />
@@ -331,7 +331,6 @@ const UnitsManagement = () => {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            {/* Header */}
             <div className="flex items-center justify-between p-6 border-b">
               <h3 className="text-xl font-bold">
                 {editingUnit ? 'Editar Unidade' : 'Cadastrar Unidade'}
