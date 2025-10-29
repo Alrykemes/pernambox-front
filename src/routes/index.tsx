@@ -3,7 +3,9 @@ import { DashboardLayout } from "@/layouts/DashboardLayout";
 import type { RouteObject } from "react-router-dom";
 import { authRoutes } from "./auth.routes";
 import { dashboard } from "./dashboard";
-import { passwordResetRoutes } from "./password-reset.routes";
+import { passwordResetRoutes } from "./password-reset.routes"; 
+import { unitsRoutes } from "./units.routes";
+import { employeesRoutes } from "./employee.routes";
 
 export const routes: RouteObject[] = [
   {
@@ -12,6 +14,6 @@ export const routes: RouteObject[] = [
   },
   {
     element: <DashboardLayout />,
-    children: [...dashboard],
+    children: [...dashboard, ...unitsRoutes, ...employeesRoutes],
   },
 ];
