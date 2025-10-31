@@ -11,7 +11,13 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  XAxis,
+} from "recharts";
 
 const chartConfig = {
   ideal: {
@@ -30,14 +36,14 @@ interface InventoryChartProps {
 
 export function InventoryChart({ data }: InventoryChartProps) {
   return (
-    <div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Controle de Estoque</CardTitle>
-          <CardDescription>Janeiro - Junho 2025</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig}>
+    <Card>
+      <CardHeader>
+        <CardTitle>Controle de Estoque</CardTitle>
+        <CardDescription>Janeiro - Junho 2025</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig}>
+          <ResponsiveContainer width="100%" height="100%">
             <LineChart
               accessibilityLayer
               data={data}
@@ -70,9 +76,9 @@ export function InventoryChart({ data }: InventoryChartProps) {
                 dot={false}
               />
             </LineChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
-    </div>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </CardContent>
+    </Card>
   );
 }

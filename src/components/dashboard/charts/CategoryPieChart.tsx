@@ -11,7 +11,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
-import { Pie, PieChart } from "recharts";
+import { Pie, PieChart, ResponsiveContainer } from "recharts";
 
 interface CategoryPieChartProps {
   data: { category: string; quantity: number; fill: string }[];
@@ -42,27 +42,38 @@ const chartConfig = {
 
 export function CategoryPieChart({ data }: CategoryPieChartProps) {
   return (
-    <div>
-      <Card className="flex flex-col">
-        <CardHeader className="items-center pb-0">
-          <CardTitle>Categorias</CardTitle>
-          <CardDescription>Janeiro - Junho 2025</CardDescription>
-        </CardHeader>
-        <CardContent className="flex-1 pb-0">
-          <ChartContainer
-            config={chartConfig}
-            className="mx-auto aspect-square max-h-[300px]"
-          >
+    <Card>
+      <CardHeader>
+        <CardTitle>Categorias</CardTitle>
+        <CardDescription>Janeiro - Junho 2025</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[300px]"
+        >
+          <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={data} dataKey="quantity" />
+              <Pie
+                data={data}
+                dataKey="quantity"
+                cx="50%"
+                cy="50%"
+                innerRadius="30%"
+                outerRadius="60%"
+                startAngle={90}
+                endAngle={-270}
+                paddingAngle={2}
+                label={false}
+              />
               <ChartLegend
                 content={<ChartLegendContent nameKey="category" />}
                 className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
               />
             </PieChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
-    </div>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </CardContent>
+    </Card>
   );
 }
