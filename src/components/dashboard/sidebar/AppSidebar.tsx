@@ -25,11 +25,11 @@ const user = {
 };
 
 const mainNavItems = [
-  { title: "Home", url: "#", icon: Home },
-  { title: "Unidades", url: "#", icon: MapPinHouse },
-  { title: "Estoque", url: "#", icon: Warehouse },
-  { title: "Produtos", url: "#", icon: Handbag },
-  { title: "Usuários", url: "#", icon: Users },
+  { title: "Home", url: "/dashboard", icon: Home },
+  { title: "Unidades", url: "/dashboard/unidades", icon: MapPinHouse },
+  { title: "Estoque", url: "/dashboard/estoque", icon: Warehouse },
+  { title: "Produtos", url: "/dashboard/produtos", icon: Handbag },
+  { title: "Usuários", url: "/dashboard/usuarios", icon: Users },
 ];
 
 const SettingsNavItems = [{ title: "Sistema", url: "#", icon: Settings }];
