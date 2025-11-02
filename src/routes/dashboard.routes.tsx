@@ -1,7 +1,7 @@
-import Home from "../pages/dashboard/Home";
-import Unit from "../pages/dashboard/Unit";
+import Home from "@/pages/dashboard/Home";
+import Unit from "@/pages/dashboard/Unit";
 
-export const dashboard = [
+export const dashboardRoutes = [
   {
     path: "/dashboard",
     element: <Home />,

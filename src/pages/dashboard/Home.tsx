@@ -1,5 +1,4 @@
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
-import { Header } from "@/components/dashboard/Header";
 
 import { CategoryPieChart } from "@/components/dashboard/charts/CategoryPieChart";
 import { InventoryChart } from "@/components/dashboard/charts/InventoryChart";
@@ -25,41 +24,38 @@ const chartData2 = [
 
 export default function Home() {
   return (
-    <>
-      <Header />
-      <div className="p-4">
-        <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <DashboardCard
-            title="Total de Produtos"
-            content="1234"
-            footer="+12% no último mês"
-            icon={<ShoppingBag className="h-4 w-4 text-orange-500" />}
-          />
-          <DashboardCard
-            title="Total de Produtos"
-            content="1234"
-            footer="+12% no último mês"
-            icon={<ShoppingBag className="h-4 w-4 text-orange-500" />}
-          />
-          <DashboardCard
-            title="Total de Produtos"
-            content="1234"
-            footer="+12% no último mês"
-            icon={<ShoppingBag className="h-4 w-4 text-orange-500" />}
-          />
-          <DashboardCard
-            title="Total de Produtos"
-            content="1234"
-            footer="+12% no último mês"
-            icon={<ShoppingBag className="h-4 w-4 text-orange-500" />}
-          />
-        </div>
-        <div className="grid grid-cols-2 items-stretch gap-6 pt-3">
-          <InventoryChart data={chartData} />
-          <CategoryPieChart data={chartData2} />
-        </div>
-        <StockTable />
+    <div className="p-4">
+      <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <DashboardCard
+          title="Total de Produtos"
+          content="1234"
+          footer="+12% no último mês"
+          icon={<ShoppingBag className="h-4 w-4 text-orange-500" />}
+        />
+        <DashboardCard
+          title="Total de Produtos"
+          content="1234"
+          footer="+12% no último mês"
+          icon={<ShoppingBag className="h-4 w-4 text-orange-500" />}
+        />
+        <DashboardCard
+          title="Total de Produtos"
+          content="1234"
+          footer="+12% no último mês"
+          icon={<ShoppingBag className="h-4 w-4 text-orange-500" />}
+        />
+        <DashboardCard
+          title="Total de Produtos"
+          content="1234"
+          footer="+12% no último mês"
+          icon={<ShoppingBag className="h-4 w-4 text-orange-500" />}
+        />
       </div>
-    </>
+      <div className="grid grid-cols-2 items-stretch gap-6 pt-3">
+        <InventoryChart data={chartData} />
+        <CategoryPieChart data={chartData2} />
+      </div>
+      <StockTable />
+    </div>
   );
 }

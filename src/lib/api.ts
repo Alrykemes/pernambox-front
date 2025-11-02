@@ -1,6 +1,7 @@
 import { useAuthStore } from "@/stores/auth-store";
 import axios from "axios";
 import { toast } from "sonner";
+console.log(import.meta.env.VITE_BASE_URL);
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -32,7 +33,7 @@ api.interceptors.response.use(
         const { data } = await api.get("/auth/refresh-token", {
           withCredentials: true,
         });
-        const { accessToken } = data;
+        const accessToken = data.token;
         useAuthStore.getState().setAccessToken(accessToken);
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
@@ -43,6 +44,8 @@ api.interceptors.response.use(
       toast.error("Erro interno do servidor: " + message);
     } else {
       console.log("Erro: " + message);
+      // logout user
+      // useAuthStore.getState().logout();
     }
 
     return Promise.reject(error);
