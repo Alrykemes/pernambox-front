@@ -1,5 +1,5 @@
-import { Header } from "@/components/dashboard/Header";
-import { AppSidebar } from "@/components/dashboard/sidebar/AppSidebar";
+import { Header } from "@/components/layouts/DashboardLayout/Header";
+import { AppSidebar } from "@/components/layouts/DashboardLayout/sidebar/AppSidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Outlet } from "react-router-dom";
 
@@ -8,8 +8,8 @@ export function DashboardLayout() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
+        <Header />
         <main>
-          <Header />
           <Outlet />
         </main>
       </SidebarInset>

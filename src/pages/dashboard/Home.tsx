@@ -1,8 +1,8 @@
-import { DashboardCard } from "@/components/dashboard/DashboardCard";
+import { DashboardCard } from "@/pages/dashboard/components/DashboardCard";
 
-import { CategoryPieChart } from "@/components/dashboard/charts/CategoryPieChart";
-import { InventoryChart } from "@/components/dashboard/charts/InventoryChart";
-import { StockTable } from "@/components/dashboard/tables/StockTable";
+import { CategoryPieChart } from "@/pages/dashboard/components/charts/CategoryPieChart";
+import { InventoryChart } from "@/pages/dashboard/components/charts/InventoryChart";
+import { StockTable } from "@/pages/dashboard/components/tables/StockTable";
 import { ShoppingBag } from "lucide-react";
 
 const chartData = [
@@ -51,7 +51,7 @@ export default function Home() {
           icon={<ShoppingBag className="h-4 w-4 text-orange-500" />}
         />
       </div>
-      <div className="grid grid-cols-2 items-stretch gap-6 pt-3">
+      <div className="grid grid-cols-1 items-stretch gap-6 pt-3 sm:grid-cols-2">
         <InventoryChart data={chartData} />
         <CategoryPieChart data={chartData2} />
       </div>

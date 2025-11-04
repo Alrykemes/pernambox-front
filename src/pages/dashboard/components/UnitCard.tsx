@@ -16,18 +16,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import api from "@/lib/api";
 import type { Unit } from "@/types/unit";
-import { MapPin, PackageOpen, SquarePen, Trash, Users } from "lucide-react";
-import { Button } from "../ui/button";
+import { Building2, Trash } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Button } from "../../../components/ui/button";
+import { EditUnitDialog } from "./UnitCard/EditUnitDialog";
 
 interface UnitCardProps {
   unit: Unit;
@@ -36,31 +31,39 @@ interface UnitCardProps {
 export function UnitCard({
   unit: { id, name, phone, email, responsible, address },
 }: UnitCardProps) {
+  const queryClient = useQueryClient();
+
   const handleUnitDelete = async () => {
-    const response = await api.delete("/unit", { data: { id } });
-    console.log(response);
+    try {
+      await api.delete(`/unit/${id}`);
+      toast.success("Unidade excluída");
+      // refresh units list
+      queryClient.invalidateQueries({ queryKey: ["units"] });
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao excluir unidade");
+    }
   };
 
   return (
     <Card>
       <CardHeader className="flex justify-between">
         <div className="flex gap-2">
-          <div className="rounded-sm bg-blue-300 p-3">
-            <MapPin className="h-4 w-4 text-blue-500" />
+          <div className="rounded-sm bg-blue-300 p-2">
+            <Building2 className="h-6 w-6 text-blue-500" />
           </div>
           <div>
             <CardTitle className="">{name}</CardTitle>
             <CardDescription className="text-sm">
-              {/* city */}
-              Olinda
+              {address.city} - {address.state}
             </CardDescription>
           </div>
         </div>
-        {/* status */}
         <span className="rounded-full bg-green-500 px-3 py-0.5 text-sm">
           Operacional
         </span>
       </CardHeader>
+
       <CardContent className="flex flex-col gap-4">
         <div className="flex flex-col">
           <span className="text-base font-bold">Endereço:</span>
@@ -69,53 +72,25 @@ export function UnitCard({
             {address.city} - {address.state}, {address.zipCode}
           </span>
         </div>
+
         <div className="flex flex-col">
           <span className="text-base font-bold">Responsável:</span>
-          {/* responsible */}
-          <span className="text-muted-foreground">{responsible.name}</span>
+          <span className="text-muted-foreground">
+            {responsible?.name ?? "-"}
+          </span>
         </div>
+
         <div className="flex flex-col">
           <span className="text-base font-bold">Contato:</span>
           <span className="text-muted-foreground">{phone}</span>
           <span className="text-muted-foreground">{email}</span>
         </div>
-        <div className="flex justify-between border-t py-4">
-          <div className="flex flex-col items-center">
-            <div className="flex items-center">
-              <PackageOpen className="h-5 w-5 text-gray-600" />
-              <span className="ml-2 font-bold text-gray-600">
-                Total de Itens:
-              </span>
-            </div>
-            <span className="font-bold">456</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="flex items-center">
-              <Users className="h-5 w-5 text-gray-600" />
-              <span className="ml-2 font-bold text-gray-600">
-                Total de Usuários:
-              </span>
-            </div>
-            <span className="font-bold">23</span>
-          </div>
-        </div>
+
         <div className="flex flex-row-reverse gap-5 text-gray-800">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost">
-                <SquarePen className="h-5 w-5 cursor-pointer" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Editar Unidade</DialogTitle>
-                <DialogDescription>
-                  Faça alterações nesta unidade aqui. Clique em salvar quando
-                  terminar.
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
+          {/* Edit Dialog (opens edit form pre-filled) */}
+          <EditUnitDialog
+            unit={{ id, name, phone, email, responsible, address }}
+          />
 
           <AlertDialog>
             <AlertDialogTrigger asChild>

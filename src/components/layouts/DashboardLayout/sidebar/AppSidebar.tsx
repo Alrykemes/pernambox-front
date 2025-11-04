@@ -1,6 +1,6 @@
-import { NavGroup } from "@/components/dashboard/sidebar/NavGroup";
-import { UnitHeader } from "@/components/dashboard/sidebar/UnitHeader";
-import { UserMenu } from "@/components/dashboard/sidebar/UserMenu";
+import { NavGroup } from "@/components/layouts/DashboardLayout/sidebar/NavGroup";
+import { UnitHeader } from "@/components/layouts/DashboardLayout/sidebar/UnitHeader";
+import { UserMenu } from "@/components/layouts/DashboardLayout/sidebar/UserMenu";
 import {
   Sidebar,
   SidebarContent,
@@ -8,6 +8,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useAuthStore } from "@/stores/auth-store";
 import {
   Handbag,
   Home,
@@ -17,12 +18,6 @@ import {
   Warehouse,
 } from "lucide-react";
 import * as React from "react";
-
-const user = {
-  name: "john doe",
-  email: "john-doe@gmail.com",
-  avatar: "",
-};
 
 const mainNavItems = [
   { title: "Home", url: "/dashboard", icon: Home },
@@ -35,6 +30,7 @@ const mainNavItems = [
 const SettingsNavItems = [{ title: "Sistema", url: "#", icon: Settings }];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuthStore();
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -44,9 +40,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavGroup label="MENU PRINCIPAL" items={mainNavItems} />
         <NavGroup label="CONFIGURAÇÕES" items={SettingsNavItems} />
       </SidebarContent>
-      <SidebarFooter>
-        <UserMenu user={user} />
-      </SidebarFooter>
+      <SidebarFooter>{user ? <UserMenu user={user} /> : null}</SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

@@ -1,24 +1,38 @@
-import api from "@/lib/api";
+import { authApi } from "@/lib/authApi";
 import { useAuthStore } from "@/stores/auth-store";
-import { useEffect } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 
-export function AuthInitializer({ children }: { children: React.ReactNode }) {
-  const { accessToken, setAccessToken, fetchUser, logout } = useAuthStore();
+export function AuthInitializer({ children }: { children: ReactNode }) {
+  const { accessToken, setAccessToken, setUser } = useAuthStore();
+  const triedRefreshRef = useRef(false);
 
   useEffect(() => {
-    const init = async () => {
+    const tryRefresh = async () => {
+      if (accessToken || triedRefreshRef.current) return;
+      triedRefreshRef.current = true;
+
+      const hasSession = sessionStorage.getItem("sessionActive");
+      if (!hasSession) {
+        console.log("Sem sessão local — não tentando refresh.");
+        return;
+      }
+
       try {
-        const { data } = await api.get("/auth/refresh-token", {
+        console.log("Tentando refresh token...");
+        const { data } = await authApi.get("/auth/refresh-token", {
           withCredentials: true,
         });
         setAccessToken(data.accessToken);
-        await fetchUser();
-      } catch {
-        logout();
+        setUser(data.user);
+        console.log("Sessão restaurada com sucesso.");
+      } catch (err) {
+        console.warn("Refresh falhou, limpando sessão.", err);
+        sessionStorage.removeItem("sessionActive");
       }
     };
-    if (!accessToken) init();
-  }, []);
 
-  return <>{children}</>;
+    tryRefresh();
+  }, [accessToken, setAccessToken, setUser]);
+
+  return children;
 }

@@ -1,5 +1,3 @@
-import { DashboardCard } from "@/components/dashboard/DashboardCard";
-import { UnitCard } from "@/components/dashboard/UnitCard";
 import { HookFormProvider } from "@/components/form/HookFormProvider";
 import { InputField } from "@/components/form/InputField";
 import { ResponsibleSelect } from "@/components/form/SelectField";
@@ -13,6 +11,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import api from "@/lib/api";
+import { queryClient } from "@/lib/react-query";
+import { DashboardCard } from "@/pages/dashboard/components/DashboardCard";
+import { UnitCard } from "@/pages/dashboard/components/UnitCard/UnitCard";
 import {
   UnitCreateSchema,
   type UnitCreateType,
@@ -20,11 +21,13 @@ import {
 import type { Unit } from "@/types/unit";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { MapPin, Plus, Users } from "lucide-react";
+import { MapPin, Plus } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function UnitPage() {
+  const [open, setOpen] = useState(false);
   const { data: units } = useQuery<Unit[]>({
     queryKey: ["units"],
     queryFn: async () => {
@@ -57,12 +60,15 @@ export default function UnitPage() {
   });
 
   const onSubmit = async (data: UnitCreateType) => {
-    console.log("Submitting data:", data);
     try {
       const response = await api.post("/unit", data);
-      console.log(response);
-      if (response.data.success) {
+      if (response.status === 200 || response.data.success) {
         toast.success("Unidade criada com sucesso!");
+        setOpen(false);
+        queryClient.invalidateQueries({ queryKey: ["units"] });
+        form.reset();
+      } else {
+        toast.error("Erro ao criar unidade. Tente novamente.");
       }
     } catch (error) {
       toast.error("Erro ao criar unidade. Tente novamente.");
@@ -72,24 +78,12 @@ export default function UnitPage() {
 
   return (
     <div className="p-4">
-      <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2">
         <DashboardCard
           title="Total de Unidades"
           content="3"
           footer="Total de unidades cadastradas"
           icon={<MapPin className="h-4 w-4 text-blue-500" />}
-        />
-        <DashboardCard
-          title="Unidades Operacionais"
-          content="3"
-          footer="Unidades em operação"
-          icon={<MapPin className="h-4 w-4 text-green-500" />}
-        />
-        <DashboardCard
-          title="Unidades Indisponíveis"
-          content="0"
-          footer="Unidades fora de operação"
-          icon={<Users className="h-4 w-4 text-red-500" />}
         />
         <DashboardCard
           title="Última Adicionada"
@@ -105,7 +99,7 @@ export default function UnitPage() {
             Crie e Gerencie suas unidades
           </h4>
         </div>
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="bg-blue-950 hover:bg-blue-900">
               <Plus />
@@ -139,15 +133,12 @@ export default function UnitPage() {
                   label="E-mail"
                   placeholder="john@example.com"
                 />
-
-                {/* CORREÇÃO: ResponsibleSelect sem a propriedade value problemática */}
                 <ResponsibleSelect
                   control={form.control}
                   name="responsible_id"
                   label="Responsável"
                   placeholder="Selecione um responsável"
                 />
-
                 <div className="grid grid-cols-2 gap-4">
                   <InputField
                     control={form.control}
@@ -199,8 +190,6 @@ export default function UnitPage() {
                     placeholder="Apto 101"
                   />
                 </div>
-
-                {/* Botão de submit */}
                 <Button
                   type="submit"
                   className="w-full bg-blue-950 hover:bg-blue-900"

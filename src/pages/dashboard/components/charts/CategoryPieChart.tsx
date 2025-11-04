@@ -11,7 +11,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
-import { Pie, PieChart, ResponsiveContainer } from "recharts";
+import { Pie, PieChart } from "recharts";
 
 interface CategoryPieChartProps {
   data: { category: string; quantity: number; fill: string }[];
@@ -52,26 +52,24 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
           config={chartConfig}
           className="mx-auto aspect-square max-h-[300px]"
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                dataKey="quantity"
-                cx="50%"
-                cy="50%"
-                innerRadius="30%"
-                outerRadius="60%"
-                startAngle={90}
-                endAngle={-270}
-                paddingAngle={2}
-                label={false}
-              />
-              <ChartLegend
-                content={<ChartLegendContent nameKey="category" />}
-                className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey="quantity"
+              cx="50%"
+              cy="50%"
+              innerRadius="30%"
+              outerRadius="60%"
+              startAngle={90}
+              endAngle={-270}
+              paddingAngle={2}
+              label={false}
+            />
+            <ChartLegend
+              content={<ChartLegendContent nameKey="category" />}
+              className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+            />
+          </PieChart>
         </ChartContainer>
       </CardContent>
     </Card>

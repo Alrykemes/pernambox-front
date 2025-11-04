@@ -1,5 +1,4 @@
-import type { LucideIcon } from "lucide-react";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent } from "../../../components/ui/card";
 
 interface DashboardCardProps {
   title: string;
@@ -13,7 +12,7 @@ export function DashboardCard({
   content,
   footer,
   icon,
-}: DashboardCardProps) {;
+}: DashboardCardProps) {
   return (
     <Card className="h-full px-2 transition-shadow hover:shadow-lg">
       <CardContent className="flex h-full flex-col justify-between gap-1">

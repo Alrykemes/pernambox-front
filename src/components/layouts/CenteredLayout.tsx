@@ -32,7 +32,7 @@ export function CenteredLayout() {
           />
         ) : null}
       </div>
-      <div className="w-full max-w-11/12 sm:max-w-lg">
+      <main className="w-full max-w-11/12 sm:max-w-lg">
         {formTitle && (
           <h1
             className={
@@ -49,7 +49,7 @@ export function CenteredLayout() {
         )}
 
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 }
