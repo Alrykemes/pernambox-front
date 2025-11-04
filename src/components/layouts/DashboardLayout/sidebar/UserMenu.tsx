@@ -1,5 +1,3 @@
-import { Bell, ChevronsUpDown, CircleUser, LogOut } from "lucide-react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -17,17 +15,11 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/stores/auth-store";
+import type { User } from "@/types/user";
+import { Bell, ChevronsUpDown, CircleUser, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-interface UserMenuProps {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}
-
-export function UserMenu({ user }: UserMenuProps) {
+export function UserMenu({ user }: {user: User}) {
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
   const { logout } = useAuthStore();
@@ -92,16 +84,18 @@ export function UserMenu({ user }: UserMenuProps) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => {
-              logout();
-              navigate("/");
-            }}>
+            <DropdownMenuItem
+              onClick={() => {
+                logout();
+                navigate("/");
+              }}
+            >
               <LogOut />
               Sair
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
-    </SidebarMenu >
+    </SidebarMenu>
   );
 }

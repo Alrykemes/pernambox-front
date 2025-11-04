@@ -1,3 +1,4 @@
+import { authApi } from "@/lib/authApi";
 import { useAuthStore } from "@/stores/auth-store";
 import axios from "axios";
 import { toast } from "sonner";
@@ -8,14 +9,33 @@ const api = axios.create({
   withCredentials: true,
 });
 
-api.interceptors.request.use((config) => {
-  const { accessToken } = useAuthStore.getState();
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+export const setAuthToken = (token?: string) => {
+  if (token) {
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  } else {
+    delete api.defaults.headers.common["Authorization"];
   }
+};
+
+// attach token to each request if available
+api.interceptors.request.use((config) => {
+  const sessionActive = sessionStorage.getItem("sessionActive");
+  if (!sessionActive) {
+    console.log("Sem sessão ativa");
+    return config;
+  }
+
+  if (!config.headers?.Authorization) {
+    const { accessToken } = useAuthStore.getState();
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+  }
+  console.log("Request headers:", config.headers?.Authorization ?? null);
   return config;
 });
 
+// get response and handle errors globally
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
@@ -29,15 +49,21 @@ api.interceptors.response.use(
     if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const { data } = await api.get("/auth/refresh-token", {
+        console.log("axios: tentando refresh token");
+        const { data } = await authApi.get("/auth/refresh-token", {
           withCredentials: true,
         });
-        const { accessToken } = data;
-        useAuthStore.getState().setAccessToken(accessToken);
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+        const newToken = data.token;
+        setAuthToken(newToken);
+        useAuthStore.getState().setAccessToken(newToken);
+
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (err) {
-        useAuthStore.getState().logout();
+        console.log("axios: refresh token falhou, limpando autenticação local");
+        useAuthStore.getState().logout(false);
+        return Promise.reject(err);
       }
     } else if (status === 500) {
       toast.error("Erro interno do servidor: " + message);

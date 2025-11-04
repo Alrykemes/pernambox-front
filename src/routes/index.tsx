@@ -1,17 +1,25 @@
-import { CenteredLayout } from "@/layouts/CenteredLayout";
-import { DashboardLayout } from "@/layouts/DashboardLayout";
+import { CenteredLayout } from "@/components/layouts/CenteredLayout";
+import { DashboardLayout } from "@/components/layouts/DashboardLayout";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { authRoutes } from "@/routes/auth.routes";
+import { dashboardRoutes } from "@/routes/dashboard.routes";
 import type { RouteObject } from "react-router-dom";
-import { authRoutes } from "./auth.routes";
-import { dashboard } from "./dashboard";
 import { passwordResetRoutes } from "./password-reset.routes";
 
 export const routes: RouteObject[] = [
   {
+    path: "/",
     element: <CenteredLayout />,
     children: [...authRoutes, ...passwordResetRoutes],
   },
   {
-    element: <DashboardLayout />,
-    children: [...dashboard],
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    ),
+    children: [...dashboardRoutes],
+    handle: { breadcrumb: "Dashboard" },
   },
 ];

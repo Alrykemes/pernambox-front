@@ -1,12 +1,9 @@
-import type { Unit } from "@/types/unit";
-
 export interface User {
-  id: string;
+  userId: string;
   name: string;
   cpf: string;
   email: string;
   phone: string;
   role: string;
-  unit: Unit;
   avatar?: string;
 }

@@ -1,6 +1,6 @@
-import { NavGroup } from "@/components/dashboard/sidebar/NavGroup";
-import { UnitHeader } from "@/components/dashboard/sidebar/UnitHeader";
-import { UserMenu } from "@/components/dashboard/sidebar/UserMenu";
+import { NavGroup } from "@/components/layouts/DashboardLayout/sidebar/NavGroup";
+import { UnitHeader } from "@/components/layouts/DashboardLayout/sidebar/UnitHeader";
+import { UserMenu } from "@/components/layouts/DashboardLayout/sidebar/UserMenu";
 import {
   Sidebar,
   SidebarContent,
@@ -8,6 +8,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useAuthStore } from "@/stores/auth-store";
 import {
   Handbag,
   Home,
@@ -18,23 +19,18 @@ import {
 } from "lucide-react";
 import * as React from "react";
 
-const user = {
-  name: "john doe",
-  email: "john-doe@gmail.com",
-  avatar: "",
-};
-
 const mainNavItems = [
-  { title: "Home", url: "#", icon: Home },
-  { title: "Unidades", url: "#", icon: MapPinHouse },
-  { title: "Estoque", url: "#", icon: Warehouse },
-  { title: "Produtos", url: "#", icon: Handbag },
-  { title: "Usuários", url: "#", icon: Users },
+  { title: "Home", url: "/dashboard", icon: Home },
+  { title: "Unidades", url: "/dashboard/unidades", icon: MapPinHouse },
+  { title: "Estoque", url: "/dashboard/estoque", icon: Warehouse },
+  { title: "Produtos", url: "/dashboard/produtos", icon: Handbag },
+  { title: "Usuários", url: "/dashboard/usuarios", icon: Users },
 ];
 
 const SettingsNavItems = [{ title: "Sistema", url: "#", icon: Settings }];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuthStore();
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -44,9 +40,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavGroup label="MENU PRINCIPAL" items={mainNavItems} />
         <NavGroup label="CONFIGURAÇÕES" items={SettingsNavItems} />
       </SidebarContent>
-      <SidebarFooter>
-        <UserMenu user={user} />
-      </SidebarFooter>
+      <SidebarFooter>{user ? <UserMenu user={user} /> : null}</SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
