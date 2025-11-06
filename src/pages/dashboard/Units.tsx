@@ -1,6 +1,6 @@
 import { HookFormProvider } from "@/components/form/HookFormProvider";
 import { InputField } from "@/components/form/InputField";
-import { ResponsibleSelect } from "@/components/form/SelectField";
+import { ResponsibleSelect } from "@/components/form/ResponsibleSelect";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

@@ -4,6 +4,7 @@ export interface User {
   cpf: string;
   email: string;
   phone: string;
+  active: boolean;
   role: string;
   avatar?: string;
 }
