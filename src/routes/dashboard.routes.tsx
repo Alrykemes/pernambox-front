@@ -1,5 +1,6 @@
 import Home from "@/pages/dashboard/Home";
-import Unit from "@/pages/dashboard/Unit";
+import Unit from "@/pages/dashboard/Units";
+import Users from "@/pages/dashboard/Users";
 import { Navigate } from "react-router-dom";
 
 export const dashboardRoutes = [
@@ -17,4 +18,9 @@ export const dashboardRoutes = [
     element: <Unit />,
     handle: { breadcrumb: "Unidades" },
   },
+  {
+    path: "usuarios",
+    element: <Users />,
+    handle: { breadcrumb: "Usuários" },
+  }
 ];

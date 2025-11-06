@@ -3,7 +3,7 @@ import { Card, CardContent } from "../../../components/ui/card";
 interface DashboardCardProps {
   title: string;
   content: string;
-  footer: string;
+  footer?: string;
   icon?: React.ReactNode;
 }
 
