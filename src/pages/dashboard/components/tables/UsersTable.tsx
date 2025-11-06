@@ -38,10 +38,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-/**
- * Schema de atualização usado apenas no formulário de edição dentro do UsersTable.
- * Ajuste os campos se o DTO do backend tiver outro shape.
- */
 const UserUpdateSchema = z.object({
   userId: z.string().nonempty(),
   name: z.string().min(3, "O nome deve ter no mínimo 3 caracteres"),
