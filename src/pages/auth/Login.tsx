@@ -11,7 +11,6 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-
 export default function Login() {
   const { login } = useAuthStore();
   const navigate = useNavigate();
