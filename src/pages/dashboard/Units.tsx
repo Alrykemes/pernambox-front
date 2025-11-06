@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
 import { queryClient } from "@/lib/react-query";
 import { DashboardCard } from "@/pages/dashboard/components/DashboardCard";
@@ -102,116 +103,124 @@ export default function UnitPage() {
             {user?.role === "USER" && "Verifique e vizualize as unidades"}
           </h4>
         </div>
-        {user?.role === "ADMIN" && (
+        <div className="flex items-center gap-4 pt-6 pb-2">
+        
+        <Input
+        className="width-lg"
+        type="text"
+        placeholder="Nome Unidade"
+        title="Pesquisar Unidade"
+        />
+          {user?.role === "ADMIN" && (
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-950 hover:bg-blue-900">
+                  <Plus />
+                  Adicionar Unidade
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Adicionar Nova Unidade</DialogTitle>
+                  <DialogDescription>
+                    Formulário para adicionar uma nova unidade.
+                  </DialogDescription>
+                </DialogHeader>
+                <HookFormProvider form={form} onSubmit={onSubmit}>
+                  <div className="space-y-4">
+                    <InputField
+                      control={form.control}
+                      name="name"
+                      label="Nome"
+                      placeholder="Unidade Olinda"
+                    />
+                    <InputField
+                      control={form.control}
+                      name="phone"
+                      label="Telefone"
+                      placeholder="(81) 99999-9999"
+                    />
+                    <InputField
+                      control={form.control}
+                      name="email"
+                      label="E-mail"
+                      placeholder="john@example.com"
+                    />
+                    <ResponsibleSelect
+                      control={form.control}
+                      name="responsible_id"
+                      label="Responsável"
+                      placeholder="Selecione um responsável"
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <InputField
+                        control={form.control}
+                        name="address.number"
+                        label="Número"
+                        placeholder="123"
+                      />
+                      <InputField
+                        control={form.control}
+                        name="address.zipCode"
+                        label="CEP"
+                        placeholder="50000-000"
+                      />
+                    </div>
 
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-950 hover:bg-blue-900">
-                <Plus />
-                Adicionar Unidade
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Adicionar Nova Unidade</DialogTitle>
-                <DialogDescription>
-                  Formulário para adicionar uma nova unidade.
-                </DialogDescription>
-              </DialogHeader>
-              <HookFormProvider form={form} onSubmit={onSubmit}>
-                <div className="space-y-4">
-                  <InputField
-                    control={form.control}
-                    name="name"
-                    label="Nome"
-                    placeholder="Unidade Olinda"
-                  />
-                  <InputField
-                    control={form.control}
-                    name="phone"
-                    label="Telefone"
-                    placeholder="(81) 99999-9999"
-                  />
-                  <InputField
-                    control={form.control}
-                    name="email"
-                    label="E-mail"
-                    placeholder="john@example.com"
-                  />
-                  <ResponsibleSelect
-                    control={form.control}
-                    name="responsible_id"
-                    label="Responsável"
-                    placeholder="Selecione um responsável"
-                  />
-                  <div className="grid grid-cols-2 gap-4">
                     <InputField
                       control={form.control}
-                      name="address.number"
-                      label="Número"
-                      placeholder="123"
+                      name="address.street"
+                      label="Rua"
+                      placeholder="Av. Brasil"
                     />
-                    <InputField
-                      control={form.control}
-                      name="address.zipCode"
-                      label="CEP"
-                      placeholder="50000-000"
-                    />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <InputField
+                        control={form.control}
+                        name="address.district"
+                        label="Bairro"
+                        placeholder="Centro"
+                      />
+                      <InputField
+                        control={form.control}
+                        name="address.city"
+                        label="Cidade"
+                        placeholder="Recife"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <InputField
+                        control={form.control}
+                        name="address.state"
+                        label="Estado"
+                        placeholder="Pernambuco"
+                      />
+                      <InputField
+                        control={form.control}
+                        name="address.complement"
+                        label="Complemento"
+                        placeholder="Apto 101"
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      className="w-full bg-blue-950 hover:bg-blue-900"
+                      disabled={!form.formState.isValid}
+                    >
+                      Criar Unidade
+                    </Button>
                   </div>
-
-                  <InputField
-                    control={form.control}
-                    name="address.street"
-                    label="Rua"
-                    placeholder="Av. Brasil"
-                  />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <InputField
-                      control={form.control}
-                      name="address.district"
-                      label="Bairro"
-                      placeholder="Centro"
-                    />
-                    <InputField
-                      control={form.control}
-                      name="address.city"
-                      label="Cidade"
-                      placeholder="Recife"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <InputField
-                      control={form.control}
-                      name="address.state"
-                      label="Estado"
-                      placeholder="Pernambuco"
-                    />
-                    <InputField
-                      control={form.control}
-                      name="address.complement"
-                      label="Complemento"
-                      placeholder="Apto 101"
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-full bg-blue-950 hover:bg-blue-900"
-                    disabled={!form.formState.isValid}
-                  >
-                    Criar Unidade
-                  </Button>
-                </div>
-              </HookFormProvider>
-            </DialogContent>
-          </Dialog>
-        )}
+                </HookFormProvider>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">
-        
+
         {unitsArray.map((unit: Unit) => (
-          <UnitCard key={unit.id} unit={unit} user={user}/>
+          <UnitCard key={unit.id} unit={unit} user={user} />
         ))}
       </div>
     </div>

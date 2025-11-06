@@ -25,6 +25,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { DashboardCard } from "./components/DashboardCard";
 import { UsersTable } from "./components/tables/UsersTable";
+import { Input } from "@/components/ui/input";
 
 interface UserStats {
   total: number;
@@ -201,77 +202,87 @@ export default function Users() {
           </h4>
         </div>
 
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-blue-950 hover:bg-blue-900">
-              <Plus />
-              Criar Usuário
-            </Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-4 pt-6 pb-2">
 
-          <DialogContent className="max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Adicionar Novo Usuário</DialogTitle>
-              <DialogDescription>
-                Formulário para adicionar um novo usuário.
-              </DialogDescription>
-            </DialogHeader>
+          <Input
+            className="width-lg"
+            type="text"
+            placeholder="Nome Usuário"
+            title="Pesquisar Usuário"
+          />
 
-            <HookFormProvider form={form} onSubmit={handleCreateSubmit}>
-              <div className="space-y-4">
-                <InputField
-                  control={form.control}
-                  name="name"
-                  label="Nome"
-                  placeholder="John Doe"
-                />
-                <InputField
-                  control={form.control}
-                  name="cpf"
-                  label="CPF"
-                  placeholder="00000000000"
-                />
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-blue-950 hover:bg-blue-900">
+                <Plus />
+                Criar Usuário
+              </Button>
+            </DialogTrigger>
 
-                <div className="grid grid-cols-2 gap-4">
+            <DialogContent className="max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Adicionar Novo Usuário</DialogTitle>
+                <DialogDescription>
+                  Formulário para adicionar um novo usuário.
+                </DialogDescription>
+              </DialogHeader>
+
+              <HookFormProvider form={form} onSubmit={handleCreateSubmit}>
+                <div className="space-y-4">
                   <InputField
                     control={form.control}
-                    name="email"
-                    label="E-mail"
-                    placeholder="john@example.com"
+                    name="name"
+                    label="Nome"
+                    placeholder="John Doe"
                   />
                   <InputField
                     control={form.control}
-                    name="phone"
-                    label="Telefone"
-                    placeholder="(81) 99999-9999"
+                    name="cpf"
+                    label="CPF"
+                    placeholder="00000000000"
                   />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <InputField
+                      control={form.control}
+                      name="email"
+                      label="E-mail"
+                      placeholder="john@example.com"
+                    />
+                    <InputField
+                      control={form.control}
+                      name="phone"
+                      label="Telefone"
+                      placeholder="(81) 99999-9999"
+                    />
+                  </div>
+
+                  <SelectField
+                    control={form.control}
+                    name="role"
+                    label="Permissão"
+                    options={[
+                      { value: "ADMIN", label: "Administrador" },
+                      { value: "USER", label: "Funcionário" },
+                    ]}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-blue-950 hover:bg-blue-900"
+                    disabled={
+                      !form.formState.isValid || createUser.status === "pending"
+                    }
+                  >
+                    {createUser.status === "pending"
+                      ? "Criando..."
+                      : "Criar Usuário"}
+                  </Button>
                 </div>
-
-                <SelectField
-                  control={form.control}
-                  name="role"
-                  label="Permissão"
-                  options={[
-                    { value: "ADMIN", label: "Administrador" },
-                    { value: "USER", label: "Funcionário" },
-                  ]}
-                />
-
-                <Button
-                  type="submit"
-                  className="w-full bg-blue-950 hover:bg-blue-900"
-                  disabled={
-                    !form.formState.isValid || createUser.status === "pending"
-                  }
-                >
-                  {createUser.status === "pending"
-                    ? "Criando..."
-                    : "Criar Usuário"}
-                </Button>
-              </div>
-            </HookFormProvider>
-          </DialogContent>
-        </Dialog>
+              </HookFormProvider>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div>
