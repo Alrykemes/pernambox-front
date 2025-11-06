@@ -4,9 +4,10 @@ import { InfoBlock } from "@/pages/dashboard/components/UnitCard/InfoBlock";
 import { UnitCardActions } from "@/pages/dashboard/components/UnitCard/UnitCardActions";
 import { UnitCardHeader } from "@/pages/dashboard/components/UnitCard/UnitCardHeader";
 import type { Unit } from "@/types/unit";
+import type { User } from "@/types/user";
 
-export function UnitCard({ unit }: { unit: Unit }) {
-  const { id, name, phone, email, responsible, address } = unit;
+export function UnitCard({ unit, user }: { unit: Unit, user: User}) {
+  const { name, phone, email, responsible, address } = unit;
 
   return (
     <Card>
@@ -23,7 +24,7 @@ export function UnitCard({ unit }: { unit: Unit }) {
           {phone} <br /> {email}
         </InfoBlock>
 
-        <UnitCardActions unit={unit} />
+        <UnitCardActions unit={unit} user={user} />
       </CardContent>
     </Card>
   );

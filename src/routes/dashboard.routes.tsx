@@ -22,5 +22,10 @@ export const dashboardRoutes = [
     path: "usuarios",
     element: <Users />,
     handle: { breadcrumb: "Usuários" },
+  },
+  {
+    path: "profile",
+    // element: <UserProfile />,
+    handle: { breadcrumb: "User Profile" },
   }
 ];

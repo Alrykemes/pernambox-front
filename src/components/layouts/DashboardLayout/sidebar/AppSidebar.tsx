@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import * as React from "react";
 
-const mainNavItems = [
+const mainNavItemsAdmin = [
   { title: "Home", url: "/dashboard", icon: Home },
   { title: "Unidades", url: "/dashboard/unidades", icon: MapPinHouse },
   { title: "Estoque", url: "/dashboard/estoque", icon: Warehouse },
@@ -27,21 +27,45 @@ const mainNavItems = [
   { title: "Usuários", url: "/dashboard/usuarios", icon: Users },
 ];
 
+const mainNavItemsUser = [
+  { title: "Home", url: "/dashboard", icon: Home },
+  { title: "Unidades", url: "/dashboard/unidades", icon: MapPinHouse },
+  { title: "Estoque", url: "/dashboard/estoque", icon: Warehouse },
+  { title: "Produtos", url: "/dashboard/produtos", icon: Handbag }
+];
+
 const SettingsNavItems = [{ title: "Sistema", url: "#", icon: Settings }];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuthStore();
-  return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <UnitHeader unit={{ name: "Unidade Olinda", address: "Olinda, PE" }} />
-      </SidebarHeader>
-      <SidebarContent>
-        <NavGroup label="MENU PRINCIPAL" items={mainNavItems} />
-        <NavGroup label="CONFIGURAÇÕES" items={SettingsNavItems} />
-      </SidebarContent>
-      <SidebarFooter>{user ? <UserMenu user={user} /> : null}</SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
-  );
+  return user ? (
+    <>
+      {user.role === "ADMIN" && (
+        <Sidebar collapsible="icon" {...props}>
+          <SidebarHeader>
+            <UnitHeader unit={{ name: "Unidade Olinda", address: "Olinda, PE" }} />
+          </SidebarHeader>
+          <SidebarContent>
+            <NavGroup label="MENU PRINCIPAL" items={mainNavItemsAdmin} />
+            <NavGroup label="CONFIGURAÇÕES" items={SettingsNavItems} />
+          </SidebarContent>
+          <SidebarFooter>{user ? <UserMenu user={user} /> : null}</SidebarFooter>
+          <SidebarRail />
+        </Sidebar>
+      )}
+      {user.role === "USER" && (
+        <Sidebar collapsible="icon" {...props}>
+          <SidebarHeader>
+            <UnitHeader unit={{ name: "Unidade Olinda", address: "Olinda, PE" }} />
+          </SidebarHeader>
+          <SidebarContent>
+            <NavGroup label="MENU PRINCIPAL" items={mainNavItemsUser} />
+            <NavGroup label="CONFIGURAÇÕES" items={SettingsNavItems} />
+          </SidebarContent>
+          <SidebarFooter>{user ? <UserMenu user={user} /> : null}</SidebarFooter>
+          <SidebarRail />
+        </Sidebar>
+      )}
+    </>
+  ) : <></>;
 }
