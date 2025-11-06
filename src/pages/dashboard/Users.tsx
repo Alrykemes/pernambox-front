@@ -125,6 +125,49 @@ export default function Users() {
     deleteUser.mutate(user.userId);
   };
 
+  const updateUser = useMutation({
+    mutationFn: async (payload: {
+      userId: string;
+      name: string;
+      cpf: string;
+      email: string;
+      phone: string;
+      role: string;
+      active: boolean;
+    }) => {
+      const { data } = await api.put("/user/admin/update", payload);
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Usuário atualizado com sucesso!");
+      // atualiza tabela e cards
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["userStats"] });
+    },
+    onError: (err) => {
+      console.error("Erro ao atualizar usuário:", err);
+      // não fechar modal aqui — o UsersTable só fecha quando o onEdit promise resolve
+      // informe o usuário sobre o erro
+      toast.error("Erro ao atualizar usuário. Verifique os dados.");
+      throw err; // re-throw para quem chamou (UsersTable) ser notificado se quiser
+    },
+  });
+
+  // handler passado para UsersTable.
+  // UsersTable chama onEdit(payload) e espera que retorne uma Promise se for async.
+  const handleEdit = async (payload: {
+    userId: string;
+    name: string;
+    cpf: string;
+    email: string;
+    phone: string;
+    role: string;
+    active: boolean;
+  }) => {
+    // retorna a promise para que o UsersTable possa await e fechar o dialog só em sucesso
+    return updateUser.mutateAsync(payload);
+  };
+
   return (
     <div className="p-4">
       <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -243,7 +286,7 @@ export default function Users() {
         ) : (
           <UsersTable
             users={users}
-            onEdit={(u) => console.log("editar", u)}
+            onEdit={handleEdit}
             onDelete={handleDelete}
           />
         )}
