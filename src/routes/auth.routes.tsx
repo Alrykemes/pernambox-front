@@ -3,7 +3,7 @@ import Login from "@/pages/auth/Login";
 
 export const authRoutes = [
   {
-    path: "/",
+    index: true,
     element: <Login />,
     handle: {
       centeredLayout: {

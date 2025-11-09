@@ -7,7 +7,7 @@ import VerifyCode from "@/pages/password-reset/VerifyCode";
 
 export const passwordResetRoutes = [
   {
-    path: "/recuperar-senha",
+    path: "recuperar-senha",
     element: <ForgetPassword />,
     handle: {
       centeredLayout: {
@@ -19,7 +19,7 @@ export const passwordResetRoutes = [
     },
   },
   {
-    path: "/recuperar-senha/verificar",
+    path: "recuperar-senha/verificar",
     element: <VerifyCode />,
     handle: {
       centeredLayout: {
@@ -32,7 +32,7 @@ export const passwordResetRoutes = [
     },
   },
   {
-    path: "/recuperar-senha/nova",
+    path: "recuperar-senha/nova",
     element: <NewPassword />,
     handle: {
       centeredLayout: {

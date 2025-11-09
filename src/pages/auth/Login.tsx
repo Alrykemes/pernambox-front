@@ -3,10 +3,11 @@ import { CheckboxField } from "@/components/form/CheckBoxField";
 import { HookFormProvider } from "@/components/form/HookFormProvider";
 import { InputField } from "@/components/form/InputField";
 import PasswordField from "@/components/form/PasswordField";
-import Logo from "@/components/Logo";
+import SystemLogo from "@/pages/auth/components/SystemLogo";
 import { LoginSchema, type LoginType } from "@/schemas/auth/login";
 import { useAuthStore } from "@/stores/auth-store";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { KeyRound } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -41,7 +42,7 @@ export default function Login() {
 
   return (
     <>
-      <Logo />
+      <SystemLogo />
       <HookFormProvider form={form} onSubmit={onSubmit}>
         <div className="space-y-4">
           <InputField
@@ -81,6 +82,14 @@ export default function Login() {
           aria-label="botão de entrar no sistema"
         >
           Entrar
+        </AppButton>
+        <AppButton
+          disabled={true}
+          className="mt-6 h-12 w-full bg-orange-500 font-bold text-white hover:bg-orange-600"
+          aria-label="botão de entrar no sistema"
+        >
+          <KeyRound />
+          Entrar com SSO
         </AppButton>
       </HookFormProvider>
     </>
