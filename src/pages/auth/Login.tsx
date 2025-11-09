@@ -8,6 +8,7 @@ import { FormButton } from "@/components/form/FormButton";
 import SystemLogo from "@/pages/auth/components/SystemLogo";
 import { useAuthStore } from "@/stores/auth-store";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { KeyRound } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -92,6 +93,14 @@ export default function Login() {
             aria-label="Entrar no sistema"
           >
             Entrar
+          </FormButton>
+          <FormButton
+            disabled={true}
+            className="mt-6 h-12 w-full bg-orange-500 font-bold text-white hover:bg-orange-600"
+            aria-label="botão de entrar no sistema"
+          >
+            <KeyRound />
+            Entrar com SSO
           </FormButton>
         </HookFormProvider>
       </section>
