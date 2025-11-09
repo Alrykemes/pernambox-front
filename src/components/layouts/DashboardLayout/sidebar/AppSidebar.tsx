@@ -40,7 +40,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuthStore();
   return user ? (
     <>
-      {user.role === "ADMIN" && (
+      {(user.role === "ADMIN_MASTER" || user.role === "ADMIN") && (
         <Sidebar collapsible="icon" {...props}>
           <SidebarHeader>
             <UnitHeader unit={{ name: "Unidade Olinda", address: "Olinda, PE" }} />

@@ -10,7 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
 import { queryClient } from "@/lib/react-query";
 import { DashboardCard } from "@/pages/dashboard/components/DashboardCard";
@@ -105,12 +104,6 @@ export default function UnitPage() {
         </div>
         <div className="flex items-center gap-4 pt-6 pb-2">
         
-        <Input
-        className="width-lg"
-        type="text"
-        placeholder="Nome Unidade"
-        title="Pesquisar Unidade"
-        />
           {user?.role === "ADMIN" && (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>

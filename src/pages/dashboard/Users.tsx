@@ -25,7 +25,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { DashboardCard } from "./components/DashboardCard";
 import { UsersTable } from "./components/tables/UsersTable";
-import { Input } from "@/components/ui/input";
 
 interface UserStats {
   total: number;
@@ -203,13 +202,6 @@ export default function Users() {
         </div>
 
         <div className="flex items-center gap-4 pt-6 pb-2">
-
-          <Input
-            className="width-lg"
-            type="text"
-            placeholder="Nome Usuário"
-            title="Pesquisar Usuário"
-          />
 
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
