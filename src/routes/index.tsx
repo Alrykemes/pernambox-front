@@ -10,7 +10,12 @@ export const routes: RouteObject[] = [
   {
     path: "/",
     element: <CenteredLayout />,
-    children: [...authRoutes, ...passwordResetRoutes],
+    children: [...authRoutes],
+  },
+  {
+    path: "/recuperar-senha",
+    element: <CenteredLayout />,
+    children: [...passwordResetRoutes],
   },
   {
     path: "/dashboard",
