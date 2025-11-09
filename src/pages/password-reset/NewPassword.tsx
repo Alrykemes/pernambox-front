@@ -1,22 +1,31 @@
 import AppButton from "@/components/AppButton";
 import { HookFormProvider } from "@/components/form/HookFormProvider";
-import PasswordField from "@/components/form/PasswordField";
-import api from "@/lib/api";
-import {
-  NewPasswordSchema,
-  type NewPasswordType,
-} from "@/schemas/password-reset/new-password";
+import { InputPasswordField } from "@/components/form/InputPasswordField";
 import { useResetPasswordStore } from "@/stores/reset-password-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { z } from "zod";
+
+export const NewPasswordSchema = z
+  .object({
+    password: z.string().min(8, "A senha precisa ter no mínimo 8 caracteres."),
+    confirmPassword: z
+      .string()
+      .min(8, "A confirmação de senha precisa ter no mínimo 8 caracteres."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
+  });
+export type NewPasswordType = z.infer<typeof NewPasswordSchema>;
 
 export default function NewPassword() {
   const navigate = useNavigate();
-
-  const { token } = useResetPasswordStore();
+  const token = useResetPasswordStore((state) => state.token);
+  const newPassword = useResetPasswordStore((state) => state.newPassword);
 
   const form = useForm<NewPasswordType>({
     resolver: zodResolver(NewPasswordSchema),
@@ -32,63 +41,61 @@ export default function NewPassword() {
   const onSubmit = async (data: NewPasswordType) => {
     const { password } = data;
     try {
-      const response = await api.patch(
-        "/auth/password-reset",
-        {
-          password,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      console.log(response);
-      toast.success("Senha alterada com sucesso!");
-      navigate("/");
+      // backend must return success
+      const response = await newPassword(password);
+      if (response.success) {
+        toast.success("Senha alterada com sucesso!");
+        navigate("/");
+      } else {
+        toast.error("Erro ao alterar senha. Tente novamente.");
+      }
     } catch (error) {
-      toast.error("Erro ao alterar senha. Tente novamente.");
-      console.error(error);
+      toast.error("Erro de comunicação. Tente novamente mais tarde.");
     }
   };
 
   return (
-    <>
-      <HookFormProvider form={form} onSubmit={onSubmit}>
-        <div className="space-y-3">
-          <PasswordField
-            control={form.control}
-            name="password"
-            label="Senha"
-            placeholder="••••••••"
-            type="password"
-          />
-          <PasswordField
-            control={form.control}
-            name="confirmPassword"
-            label="Confirmar Senha"
-            placeholder="••••••••"
-            type="password"
-          />
-        </div>
-        <div className="mt-6 flex justify-between gap-4">
-          <AppButton
-            variant="outline"
-            disabled={form.formState.isSubmitting}
-            onClick={() => navigate("/recuperar-senha")}
-            className="bg-white px-12 font-bold text-black hover:bg-blue-700/90 hover:text-white"
-          >
-            Voltar
-          </AppButton>
+    <div>
+      <section>
+        <HookFormProvider form={form} onSubmit={onSubmit}>
+          <div className="space-y-3">
+            <InputPasswordField
+              control={form.control}
+              name="password"
+              label="Senha"
+              placeholder="••••••••"
+              type="password"
+            />
+            <InputPasswordField
+              control={form.control}
+              name="confirmPassword"
+              label="Confirmar Senha"
+              placeholder="••••••••"
+              type="password"
+            />
+          </div>
+          <div className="mt-6 flex justify-between gap-4">
+            <AppButton
+              type="button"
+              variant="outline"
+              disabled={form.formState.isSubmitting}
+              onClick={() => navigate("/recuperar-senha")}
+              className="bg-white px-12 font-bold text-black hover:bg-blue-700/90 hover:text-white"
+            >
+              Voltar
+            </AppButton>
 
-          <AppButton
-            type="submit"
-            isLoading={form.formState.isSubmitting}
-            disabled={!form.formState.isValid}
-            className="min-w-40 bg-orange-500 font-bold text-white hover:bg-orange-600"
-          >
-            Confirmar
-          </AppButton>
-        </div>
-      </HookFormProvider>
-    </>
+            <AppButton
+              type="submit"
+              isLoading={form.formState.isSubmitting}
+              disabled={!form.formState.isValid}
+              className="min-w-40 bg-orange-500 font-bold text-white hover:bg-orange-600"
+            >
+              Confirmar
+            </AppButton>
+          </div>
+        </HookFormProvider>
+      </section>
+    </div>
   );
 }
