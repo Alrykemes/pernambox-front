@@ -7,10 +7,10 @@ export function UnitCardActions({ unit, user }: { unit: Unit, user: User }) {
   const { role } = user;
   return (
     <div className="flex flex-row-reverse gap-5 text-gray-800">
-      {role == "ADMIN" && (
+      {role == "ADMIN_MASTER" && (
         <>
-          <EditUnitDialog unit={unit} />
           <DeleteUnitDialog unitId={unit.id} />
+          <EditUnitDialog unit={unit} />
         </>
       )}
     </div>

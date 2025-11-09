@@ -74,7 +74,12 @@ export function UserMenu({ user }: {user: User}) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem 
+              onClick={
+                () => {
+                  navigate("/configurações/perfil");
+                }
+              }>
                 <CircleUser />
                 Perfil
               </DropdownMenuItem>
@@ -86,7 +91,7 @@ export function UserMenu({ user }: {user: User}) {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
-                logout();
+                logout(true);
                 navigate("/");
               }}
             >

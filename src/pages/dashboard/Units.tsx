@@ -104,7 +104,7 @@ export default function UnitPage() {
         </div>
         <div className="flex items-center gap-4 pt-6 pb-2">
         
-          {user?.role === "ADMIN" && (
+          {user?.role === "ADMIN_MASTER" && (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-blue-950 hover:bg-blue-900">
