@@ -6,6 +6,7 @@ export interface Unit {
   name: string;
   phone: string;
   email: string;
+  active: boolean;
   responsible: User;
   address: Address;
 }

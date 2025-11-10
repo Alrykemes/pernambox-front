@@ -22,14 +22,22 @@ import { useAuthStore } from "@/stores/auth-store";
 import type { Unit } from "@/types/unit";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { MapPin, Plus } from "lucide-react";
+import { MapPinCheck, MapPinHouse, MapPinX, Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+interface UnitStats {
+  totalUnits: number,
+  unitsActives: number,
+  unitsDeactivates: number,
+  lastUnitCreated: Unit
+}
+
 export default function UnitPage() {
   const { user } = useAuthStore();
   const [open, setOpen] = useState(false);
+
   const { data: units } = useQuery<Unit[]>({
     queryKey: ["units"],
     queryFn: async () => {
@@ -37,6 +45,15 @@ export default function UnitPage() {
       return data;
     },
   });
+
+  const { data: unitsStats, isLoading: statsLoading } = useQuery<UnitStats>({
+      queryKey: ["unitsStats"],
+      queryFn: async () => {
+        const { data } = await api.get("/unit/info/stats");
+        return data as UnitStats;
+      },
+      staleTime: 1000 * 30,
+    });
 
   const unitsArray = units ?? [];
 
@@ -80,17 +97,25 @@ export default function UnitPage() {
 
   return user ? (
     <div className="p-4">
-      <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
           title="Total de Unidades"
-          content="3"
-          footer="Total de unidades cadastradas"
-          icon={<MapPin className="h-4 w-4 text-blue-500" />}
+          content={unitsStats ? String(unitsStats.totalUnits) : "Carregando..."}
+          icon={<MapPinHouse className="h-4 w-4 text-blue-500" />}
+        />
+        <DashboardCard
+          title="Total Ativas"
+          content={unitsStats ? String(unitsStats.unitsActives) : "Carregando..."}
+          icon={<MapPinCheck className="h-4 w-4 text-green-500" />}
+        />
+        <DashboardCard
+          title="Total Desativadas"
+          content={unitsStats ? String(unitsStats.unitsDeactivates) : "Carregando..."}
+          icon={<MapPinX className="h-4 w-4 text-red-500" />}
         />
         <DashboardCard
           title="Última Adicionada"
-          content="Unidade Olinda"
-          footer="Adicionada recentemente"
+          content={unitsStats ? String(unitsStats.lastUnitCreated.name) : "Carregando..."}
           icon={<Plus className="h-4 w-4 text-green-500" />}
         />
       </div>
