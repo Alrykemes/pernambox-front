@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { User } from "@/types/user";
+import type { User } from "@/types/common";
 import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 

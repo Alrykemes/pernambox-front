@@ -19,7 +19,7 @@ import {
   type UnitCreateType,
 } from "@/schemas/dashboard/unit-create";
 import { useAuthStore } from "@/stores/auth-store";
-import type { Unit } from "@/types/unit";
+import type { Unit } from "@/types/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { MapPinCheck, MapPinHouse, MapPinX, Plus } from "lucide-react";
@@ -123,13 +123,13 @@ export default function UnitPage() {
         <div>
           <h3 className="text-bold">Lista de Unidades</h3>
           <h4 className="text-muted-foreground text-sm">
-            {user?.role === "ADMIN" && "Crie e Gerencie suas unidades"}
-            {user?.role === "USER" && "Verifique e vizualize as unidades"}
+            {user?.role === "ADMIN_MASTER" && "Crie e Gerencie suas unidades"}
+            {(user?.role === "USER" || user?.role === "ADMIN") && "Verifique e vizualize as unidades"}
           </h4>
         </div>
         <div className="flex items-center gap-4 pt-6 pb-2">
         
-          {user?.role === "ADMIN" && (
+          {user?.role === "ADMIN_MASTER" && (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-blue-950 hover:bg-blue-900">

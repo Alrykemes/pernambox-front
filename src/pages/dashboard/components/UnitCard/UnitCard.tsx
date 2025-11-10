@@ -3,8 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { InfoBlock } from "@/pages/dashboard/components/UnitCard/InfoBlock";
 import { UnitCardActions } from "@/pages/dashboard/components/UnitCard/UnitCardActions";
 import { UnitCardHeader } from "@/pages/dashboard/components/UnitCard/UnitCardHeader";
-import type { Unit } from "@/types/unit";
-import type { User } from "@/types/user";
+import type { Unit } from "@/types/common";
+import type { User } from "@/types/common";
 
 export function UnitCard({ unit, user }: { unit: Unit, user: User}) {
   const { name, phone, email, responsible, address } = unit;

@@ -15,7 +15,7 @@ import {
   UnitCreateSchema,
   type UnitCreateType,
 } from "@/schemas/dashboard/unit-create";
-import type { Unit } from "@/types/unit";
+import type { Unit } from "@/types/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { SquarePen } from "lucide-react";
