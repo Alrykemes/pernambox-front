@@ -1,6 +1,7 @@
 import api, { setAuthToken } from "@/lib/api";
-import type { LoginType } from "@/schemas/auth/login";
-import type { User } from "@/types/user";
+import type { LoginType } from "@/pages/auth/Login";
+import type { LoginResponse } from "@/types/api/auth";
+import type { User } from "@/types/common";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -26,7 +27,10 @@ export const useAuthStore = create<AuthState>()(
         sessionStorage.setItem("sessionActive", "true");
 
         try {
-          const { data: response } = await api.post("/auth/login", data);
+          const { data: response } = await api.post<LoginResponse>(
+            "/auth/login",
+            data,
+          );
           const token = response.token;
 
           setAuthToken(token);
@@ -36,7 +40,6 @@ export const useAuthStore = create<AuthState>()(
           set({ user: user });
         } catch (error) {
           console.error("Login failed:", error);
-          throw error;
         }
       },
 

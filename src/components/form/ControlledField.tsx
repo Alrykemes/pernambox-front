@@ -15,18 +15,18 @@ import type {
 } from "react-hook-form";
 
 interface ControlledFieldProps<T extends FieldValues> {
+  id?: string;
   control: Control<T>;
   name: Path<T>;
-  id?: string;
   label?: string;
   description?: string;
   children: (field: ControllerRenderProps<T> & { id: string }) => ReactNode;
 }
 
 export function ControlledField<T extends FieldValues>({
+  id,
   control,
   name,
-  id,
   label,
   description,
   children,
