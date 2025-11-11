@@ -1,3 +1,4 @@
+import AppButton from "@/components/AppButton";
 import {
   CheckboxField,
   HookFormProvider,
@@ -31,7 +32,6 @@ export default function Login() {
     reValidateMode: "onChange",
     defaultValues: { email: "", password: "", rememberMe: false },
   });
-
   const onSubmit = async (data: LoginType) => {
     try {
       await login({
@@ -40,7 +40,7 @@ export default function Login() {
         rememberMe: data.rememberMe ?? false,
       });
       toast.success("Login realizado com sucesso!");
-      navigate("dashboard/home", { replace: true });
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       toast.error(
         "Erro ao fazer login. Verifique suas credenciais e tente novamente.",
@@ -94,14 +94,15 @@ export default function Login() {
           >
             Entrar
           </FormButton>
-          <FormButton
+          <AppButton
+            type="button"
             disabled={true}
             className="mt-6 h-12 w-full bg-orange-500 font-bold text-white hover:bg-orange-600"
             aria-label="botão de entrar no sistema"
           >
             <KeyRound />
             Entrar com SSO
-          </FormButton>
+          </AppButton>
         </HookFormProvider>
       </section>
     </div>
