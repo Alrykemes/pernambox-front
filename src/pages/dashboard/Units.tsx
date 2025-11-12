@@ -49,8 +49,8 @@ export default function UnitPage() {
   const { data: unitsStats, isLoading: statsLoading } = useQuery<UnitStats>({
       queryKey: ["unitsStats"],
       queryFn: async () => {
-        const { data } = await api.get("/unit/info/stats");
-        return data as UnitStats;
+        const response = await api.get("/unit/info/stats");
+        return response.data as UnitStats;
       },
       staleTime: 1000 * 30,
     });
@@ -80,11 +80,12 @@ export default function UnitPage() {
 
   const onSubmit = async (data: UnitCreateType) => {
     try {
-      const response = await api.post("/unit", data);
-      if (response.status === 200 || response.data.success) {
+      const response = await api.post("/unit/create", data);
+      if (response.status === 201 || response.data.success) {
         toast.success("Unidade criada com sucesso!");
         setOpen(false);
         queryClient.invalidateQueries({ queryKey: ["units"] });
+        queryClient.invalidateQueries({ queryKey: ["unitsStats"] });
         form.reset();
       } else {
         toast.error("Erro ao criar unidade. Tente novamente.");

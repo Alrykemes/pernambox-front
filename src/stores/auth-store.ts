@@ -40,6 +40,7 @@ export const useAuthStore = create<AuthState>()(
           set({ user: user });
         } catch (error) {
           console.error("Login failed:", error);
+          throw error
         }
       },
 
