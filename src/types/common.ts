@@ -1,4 +1,4 @@
-export type Role = "ADMIN" | "USER";
+export type Role = "ADMIN_MASTER" | "ADMIN" | "USER";
 
 export interface User {
   userId: string;
@@ -27,6 +27,7 @@ export interface Unit {
   name: string;
   phone: string;
   email: string;
+  active: boolean;
   responsible: User;
   address: Address;
 }

@@ -16,7 +16,7 @@ import {
   UserCreateSchema,
   type UserCreateType,
 } from "@/schemas/dashboard/user-create";
-import type { User } from "@/types/user";
+import type { User } from "@/types/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Plus, UsersIcon } from "lucide-react";
@@ -173,22 +173,22 @@ export default function Users() {
       <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
           title="Total de Usuários"
-          icon={<UsersIcon />}
+          icon={<UsersIcon className="h-4 w-4 text-blue-500"/>}
           content={userStats ? String(userStats.total) : "Carregando..."}
         />
         <DashboardCard
           title="Total de Administradores"
-          icon={<UsersIcon />}
+          icon={<UsersIcon className="h-4 w-4 text-purple-500"/>}
           content={userStats ? String(userStats.admins) : "Carregando..."}
         />
         <DashboardCard
           title="Total de Usuários Ativos"
-          icon={<UsersIcon />}
+          icon={<UsersIcon className="h-4 w-4 text-green-500"/>}
           content={userStats ? String(userStats.actives) : "Carregando..."}
         />
         <DashboardCard
           title="Total de Usuários Inativos"
-          icon={<UsersIcon />}
+          icon={<UsersIcon className="h-4 w-4 text-red-500"/>}
           content={userStats ? String(userStats.deactiveds) : "Carregando..."}
         />
       </div>

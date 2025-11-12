@@ -1,6 +1,7 @@
 import { HookFormProvider } from "@/components/form/HookFormProvider";
 import { InputField } from "@/components/form/InputField";
 import { ResponsibleSelect } from "@/components/form/ResponsibleSelect";
+import { SelectField } from "@/components/form/SelectField";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,7 +16,7 @@ import {
   UnitCreateSchema,
   type UnitCreateType,
 } from "@/schemas/dashboard/unit-create";
-import type { Unit } from "@/types/unit";
+import type { Unit } from "@/types/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { SquarePen } from "lucide-react";
@@ -36,6 +37,7 @@ export function EditUnitDialog({ unit }: { unit: Unit }) {
       phone: unit.phone ?? "",
       email: unit.email ?? "",
       responsible_id: unit.responsible?.userId ?? "",
+      active: unit.active ? "true" : "false",
       address: {
         number: unit.address?.number ?? "",
         street: unit.address?.street ?? "",
@@ -50,7 +52,7 @@ export function EditUnitDialog({ unit }: { unit: Unit }) {
 
   const onSubmit = async (data: UnitCreateType) => {
     try {
-      const response = await api.patch(`/unit/${unit.id}`, data);
+      const response = await api.patch(`/unit/update/${unit.id}`, data);
       if (response.status === 200) {
         toast.success("Unidade atualizada com sucesso");
         setOpen(false);
@@ -106,6 +108,16 @@ export function EditUnitDialog({ unit }: { unit: Unit }) {
               name="responsible_id"
               label="Responsável"
               placeholder="Selecione um responsável"
+            />
+
+            <SelectField
+              control={form.control}
+              name="active"
+              label="Status"
+              options={[
+                { value: "true", label: "Ativo" },
+                { value: "false", label: "Inativo" },
+              ]}
             />
 
             <div className="grid grid-cols-2 gap-4">
