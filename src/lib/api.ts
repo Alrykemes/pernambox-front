@@ -67,7 +67,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         console.log("axios: refresh token falhou, limpando autenticação local");
-        useAuthStore.getState().logout(false);
+        useAuthStore.getState().logout();
         return Promise.reject(err);
       }
     } else if (status === 500) {

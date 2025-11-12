@@ -1,9 +1,13 @@
-import type { User } from "@/types/common";
+import type { Role, User } from "@/types/common";
 
 export type LoginResponse = {
-  user: User;
+  userId: string;
+  email: string;
+  role: Role;
   token: string;
 };
+
+export type AuthMeResponse = User;
 
 export type InitiatePasswordResetResponse = {
   success: boolean;

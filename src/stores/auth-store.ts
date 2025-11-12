@@ -1,20 +1,22 @@
-import api, { setAuthToken } from "@/lib/api";
+import { authApi } from "@/lib/authApi";
 import type { LoginType } from "@/pages/auth/Login";
-import type { LoginResponse } from "@/types/api/auth";
+import type { AuthMeResponse, LoginResponse } from "@/types/api/auth";
 import type { User } from "@/types/common";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-
-let fetchUserPromise: Promise<User | null> | null = null;
 
 type AuthState = {
   user: User | null;
   setUser: (user: User | null) => void;
   fetchUser: () => Promise<User | null>;
-  login: (data: LoginType) => Promise<void>;
-  logout: (callServer: boolean) => Promise<void>;
+  login: (data: LoginType) => Promise<User | null>;
+  logout: () => Promise<void>;
   accessToken: string | null;
   setAccessToken: (token: string | null) => void;
+  isAuthReady: boolean;
+  setAuthReady: (v: boolean) => void;
+
+  clearAuthData: () => void;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -22,69 +24,61 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       accessToken: null,
+      isAuthReady: false,
 
       login: async (data: LoginType) => {
-        sessionStorage.setItem("sessionActive", "true");
-
         try {
-          const { data: response } = await api.post<LoginResponse>(
+          const { data: response } = await authApi.post<LoginResponse>(
             "/auth/login",
             data,
           );
           const token = response.token;
+          if (!token) throw new Error("O token de acesso não foi fornecido.");
 
-          setAuthToken(token);
           set({ accessToken: token });
+          sessionStorage.setItem("sessionActive", "true");
 
           const user = await get().fetchUser();
-          set({ user: user });
+          return user;
         } catch (error) {
-          console.error("Login failed:", error);
+          get().clearAuthData();
+          throw error;
         }
       },
 
-      logout: async (callServer: boolean) => {
-        if (callServer) {
-          try {
-            await api.post("/auth/logout", null, { withCredentials: true });
-          } catch (err) {
-            console.warn("Logout request failed:", err);
-          }
+      logout: async () => {
+        try {
+          await authApi.post("/auth/logout");
+        } catch (err) {
+          throw err;
         }
-        get().setUser(null);
-        get().setAccessToken(null);
-        setAuthToken(undefined);
+        get().clearAuthData();
+      },
+
+      fetchUser: async () => {
+        const cachedUser = get().user;
+        if (cachedUser) return cachedUser;
+        try {
+          const { data } = await authApi.get<AuthMeResponse>("/auth/me");
+          const user = data;
+          if (!user) throw new Error("Usuário não encontrado.");
+          set({ user });
+          return user;
+        } catch (err) {
+          set({ user: null });
+          throw err;
+        }
+      },
+
+      clearAuthData: () => {
+        set({ user: null, accessToken: null });
         sessionStorage.removeItem("auth-storage");
         sessionStorage.removeItem("sessionActive");
       },
 
-      fetchUser: async () => {
-        const { user } = get();
-        if (user) return user;
-
-        if (fetchUserPromise) return fetchUserPromise;
-
-        fetchUserPromise = (async () => {
-          try {
-            const { data } = await api.get("/auth/me");
-            set({ user: data });
-            return data as User;
-          } catch (err) {
-            set({ user: null });
-            return null;
-          } finally {
-            fetchUserPromise = null;
-          }
-        })();
-
-        return fetchUserPromise;
-      },
-
-      setAccessToken: (token: string | null) => {
-        set({ accessToken: token });
-        setAuthToken(token ?? undefined);
-      },
+      setAccessToken: (token) => set({ accessToken: token }),
       setUser: (user) => set({ user }),
+      setAuthReady: (ready) => set({ isAuthReady: ready }),
     }),
     {
       name: "auth-storage",
