@@ -7,6 +7,7 @@ export const recoveryApi = axios.create({
   withCredentials: true,
 });
 
+// this token is specifically for password recovery flows
 recoveryApi.interceptors.request.use((config) => {
   if (!config.headers?.Authorization) {
     const { token } = useResetPasswordStore.getState();
