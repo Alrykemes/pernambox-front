@@ -7,7 +7,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { Control, FieldValues, Path } from "react-hook-form";
 
-export interface OTPFieldProps<T extends FieldValues> {
+interface InputOTPFieldProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   label: string;
@@ -17,7 +17,7 @@ export interface OTPFieldProps<T extends FieldValues> {
   length?: number;
 }
 
-export default function OTPField<T extends FieldValues>({
+export function InputOTPField<T extends FieldValues>({
   control,
   name,
   label,
@@ -25,7 +25,7 @@ export default function OTPField<T extends FieldValues>({
   wrapperClassName,
   slotClassName,
   length = 6,
-}: OTPFieldProps<T>) {
+}: InputOTPFieldProps<T>) {
   return (
     <ControlledField
       control={control}

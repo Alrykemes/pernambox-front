@@ -15,20 +15,30 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/stores/auth-store";
-import type { User } from "@/types/user";
+import type { User } from "@/types/common";
+import { getInitials } from "@/utils/getInitials";
 import { Bell, ChevronsUpDown, CircleUser, LogOut } from "lucide-react";
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-export function UserMenu({ user }: {user: User}) {
-  const { isMobile } = useSidebar();
-  const navigate = useNavigate();
-  const { logout } = useAuthStore();
+interface UserMenuProps {
+  user: User;
+}
 
-  const getInitials = (name: string) => {
-    const names = name.split(" ").slice(0, 2);
-    const initials = names.map((n) => n.charAt(0).toUpperCase()).join("");
-    return initials;
-  };
+export function UserMenu({ user }: UserMenuProps) {
+  const navigate = useNavigate();
+  const { isMobile } = useSidebar();
+  const logout = useAuthStore((state) => state.logout);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await logout(true);
+    } catch (err) {
+      console.warn("Logout failed:", err);
+    } finally {
+      navigate("/");
+    }
+  }, [logout, navigate]);
 
   return (
     <SidebarMenu>

@@ -1,3 +1,4 @@
+import { Header } from "@/components/Header";
 import { Outlet, useMatches } from "react-router-dom";
 
 type CenteredLayoutHandle = {
@@ -21,35 +22,38 @@ export function CenteredLayout() {
   const formDescription = handle?.formDescription;
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="hidden lg:block lg:w-1/2">
-        {imgSrc ? (
-          <img
-            src={imgSrc}
-            alt={imgAlt}
-            loading="lazy"
-            className="h-125 w-125 object-contain"
-          />
-        ) : null}
-      </div>
-      <main className="w-full max-w-11/12 sm:max-w-lg">
-        {formTitle && (
-          <h1
-            className={
-              formDescription
-                ? "mb-2 text-3xl font-bold text-orange-500"
-                : "mb-12 text-3xl font-bold text-orange-500"
-            }
-          >
-            {formTitle}
-          </h1>
-        )}
-        {formDescription && (
-          <p className="mb-12 max-w-md text-gray-600">{formDescription}</p>
-        )}
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <div className="flex flex-1 items-center justify-center">
+        <div className="hidden lg:block lg:w-1/2">
+          {imgSrc ? (
+            <img
+              src={imgSrc}
+              alt={imgAlt}
+              loading="lazy"
+              className="h-125 w-125 object-contain"
+            />
+          ) : null}
+        </div>
+        <main className="w-full max-w-11/12 sm:max-w-lg">
+          {formTitle && (
+            <h1
+              className={
+                formDescription
+                  ? "mb-2 text-3xl font-bold text-orange-500"
+                  : "mb-12 text-3xl font-bold text-orange-500"
+              }
+            >
+              {formTitle}
+            </h1>
+          )}
+          {formDescription && (
+            <p className="mb-12 max-w-md text-gray-600">{formDescription}</p>
+          )}
 
-        <Outlet />
-      </main>
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

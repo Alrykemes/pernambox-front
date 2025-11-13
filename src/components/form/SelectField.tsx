@@ -8,14 +8,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import type { ComponentProps } from "react";
 import type { Control, FieldValues, Path } from "react-hook-form";
 
-export interface SelectOption {
+interface SelectOption {
   value: string;
   label: string;
 }
 
-export interface SelectFieldProps<T extends FieldValues> {
+export interface SelectFieldProps<T extends FieldValues>
+  extends Omit<
+    ComponentProps<typeof Select>,
+    "value" | "onValueChange" | "children"
+  > {
   control: Control<T>;
   name: Path<T>;
   label: string;
@@ -31,11 +36,16 @@ export function SelectField<T extends FieldValues>({
   placeholder = "Selecione uma opção",
   options,
   className,
+  ...rest
 }: SelectFieldProps<T>) {
   return (
     <ControlledField control={control} name={name} label={label}>
       {(field) => (
-        <Select onValueChange={field.onChange} value={field.value || ""}>
+        <Select
+          onValueChange={field.onChange}
+          value={field.value ?? ""}
+          {...rest}
+        >
           <SelectTrigger className={cn("h-12", className)}>
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>

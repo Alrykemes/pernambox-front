@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 export const configRoutes = [
   {
     index: true,
-    element: <Navigate to="home" replace />,
+    element: <Navigate to="sistema" replace />,
   },
   {
     path: "perfil",

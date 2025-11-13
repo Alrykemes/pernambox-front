@@ -1,97 +1,236 @@
-import api from "@/lib/api";
-import { queryClient } from "@/lib/react-query";
-import {
-  UserCreateSchema,
-  type UserCreateType,
-} from "@/schemas/dashboard/user-create";
-import type { User } from "@/types/user";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+// ajusta o caminho conforme teu projeto
 
-export default function UserProfile() {
+// --- Zod Schemas ---
 
-  const form = useForm<UserCreateType>({
-    resolver: zodResolver(UserCreateSchema),
-    mode: "onChange",
-    reValidateMode: "onChange",
+const userSchema = z.object({
+  nome: z.string().min(1, "Campo obrigatório"),
+  email: z.string().email("E-mail inválido"),
+  senha: z.string().optional(),
+  confirmarSenha: z.string().optional(),
+}).refine(
+  (data) => !data.senha || data.senha === data.confirmarSenha,
+  { message: "As senhas não coincidem", path: ["confirmarSenha"] }
+);
+
+const alterarSenhaSchema = z.object({
+  senhaAntiga: z.string().min(1, "Campo obrigatório"),
+  novaSenha: z.string().min(6, "Mínimo de 6 caracteres"),
+  confirmarNovaSenha: z.string().min(6, "Mínimo de 6 caracteres"),
+}).refine(
+  (data) => data.novaSenha === data.confirmarNovaSenha,
+  { message: "As senhas não coincidem", path: ["confirmarNovaSenha"] }
+);
+
+// --- Componente Principal ---
+export default function PerfilUsuario() {
+  const [editando, setEditando] = useState(false);
+  const [senhaDigitada, setSenhaDigitada] = useState(false);
+  const [modalAberto, setModalAberto] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(userSchema),
     defaultValues: {
-      name: "",
-      cpf: "",
-      email: "",
-      phone: "",
-      role: "USER",
+      nome: "João da Silva",
+      email: "joao@email.com",
+      senha: "",
+      confirmarSenha: "",
     },
   });
 
+  const senha = watch("senha");
+  const confirmarSenha = watch("confirmarSenha");
 
-  const updateUser = useMutation({
-    mutationFn: async (payload: {
-      userId: string;
-      name: string;
-      cpf: string;
-      email: string;
-      phone: string;
-      role: string;
-      active: boolean;
-    }) => {
-      const { data } = await api.put("/user/admin/update", payload);
-      return data;
-    },
-    onSuccess: () => {
-      toast.success("Usuário atualizado com sucesso!");
-      // atualiza tabela e cards
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      queryClient.invalidateQueries({ queryKey: ["userStats"] });
-    },
-    onError: (err) => {
-      console.error("Erro ao atualizar usuário:", err);
-      // não fechar modal aqui — o UsersTable só fecha quando o onEdit promise resolve
-      // informe o usuário sobre o erro
-      toast.error("Erro ao atualizar usuário. Verifique os dados.");
-      throw err; // re-throw para quem chamou (UsersTable) ser notificado se quiser
+  // Detecta digitação de senha
+  if (!senhaDigitada && senha) setSenhaDigitada(true);
+
+  const onSubmit = async (data: any) => {
+    // Simula requisição
+    await new Promise((r) => setTimeout(r, 1000));
+
+    console.log("Dados enviados:", data);
+
+    // Atualiza placeholders e reseta tudo
+    reset({
+      nome: data.nome,
+      email: data.email,
+      senha: "",
+      confirmarSenha: "",
+    });
+    setEditando(false);
+    setSenhaDigitada(false);
+  };
+
+  // Formulário do modal de alteração de senha
+  const {
+    register: regModal,
+    handleSubmit: handleSubmitModal,
+    reset: resetModal,
+    formState: { errors: errorsModal },
+  } = useForm({
+    resolver: zodResolver(alterarSenhaSchema),
+    defaultValues: {
+      senhaAntiga: "",
+      novaSenha: "",
+      confirmarNovaSenha: "",
     },
   });
 
-  // handler passado para UsersTable.
-  // UsersTable chama onEdit(payload) e espera que retorne uma Promise se for async.
-  const handleEdit = async (payload: {
-    userId: string;
-    name: string;
-    cpf: string;
-    email: string;
-    phone: string;
-    role: string;
-    active: boolean;
-  }) => {
-    // retorna a promise para que o UsersTable possa await e fechar o dialog só em sucesso
-    return updateUser.mutateAsync(payload);
+  const onSubmitModal = async (data: any) => {
+    await new Promise((r) => setTimeout(r, 1000));
+    console.log("Alteração de senha:", data);
+    resetModal();
+    setModalAberto(false);
   };
 
   return (
-    <div className="p-4">
-      <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        
-      </div>
+    <div className="max-w-md mx-auto space-y-6">
+      <h1 className="text-xl font-semibold">Perfil do Usuário</h1>
 
-      <div className="flex items-center justify-between pt-6 pb-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Nome */}
         <div>
-          <h3 className="text-bold">Lista de Unidades</h3>
-          <h4 className="text-muted-foreground text-sm">
-            Crie e Gerencie suas unidades
-          </h4>
+          <Label>Nome</Label>
+          <Input
+            disabled={!editando}
+            {...register("nome")}
+            placeholder="Nome"
+          />
+          {errors.nome && (
+            <p className="text-sm text-red-500">{errors.nome.message}</p>
+          )}
         </div>
 
-        <div className="flex items-center gap-4 pt-6 pb-2">
-
-
+        {/* Email */}
+        <div>
+          <Label>Email</Label>
+          <Input
+            disabled={!editando}
+            {...register("email")}
+            placeholder="Email"
+          />
+          {errors.email && (
+            <p className="text-sm text-red-500">{errors.email.message}</p>
+          )}
         </div>
-      </div>
 
-      <div>
+        {/* Campo de senha só aparece em modo de edição */}
+        {editando && (
+          <>
+            <div>
+              <Label>Senha</Label>
+              <Input
+                type="password"
+                {...register("senha")}
+                placeholder="Digite sua senha"
+              />
+            </div>
 
-      </div>
+            <div>
+              <Label>Confirmar Senha</Label>
+              <Input
+                type="password"
+                {...register("confirmarSenha")}
+                placeholder="Confirme sua senha"
+              />
+              {errors.confirmarSenha && (
+                <p className="text-sm text-red-500">
+                  {errors.confirmarSenha.message}
+                </p>
+              )}
+            </div>
+          </>
+        )}
+
+        <div className="flex gap-2">
+          {!editando ? (
+            <>
+              <Button type="button" onClick={() => setEditando(true)}>
+                Editar
+              </Button>
+              <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+                <DialogTrigger asChild>
+                  <Button variant="secondary">Alterar Senha</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Alterar Senha</DialogTitle>
+                  </DialogHeader>
+
+                  <form onSubmit={handleSubmitModal(onSubmitModal)} className="space-y-3">
+                    <div>
+                      <Label>Senha Atual</Label>
+                      <Input type="password" {...regModal("senhaAntiga")} />
+                      {errorsModal.senhaAntiga && (
+                        <p className="text-sm text-red-500">
+                          {errorsModal.senhaAntiga.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <Label>Nova Senha</Label>
+                      <Input type="password" {...regModal("novaSenha")} />
+                      {errorsModal.novaSenha && (
+                        <p className="text-sm text-red-500">
+                          {errorsModal.novaSenha.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <Label>Confirmar Nova Senha</Label>
+                      <Input type="password" {...regModal("confirmarNovaSenha")} />
+                      {errorsModal.confirmarNovaSenha && (
+                        <p className="text-sm text-red-500">
+                          {errorsModal.confirmarNovaSenha.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <DialogFooter>
+                      <Button type="submit">Salvar</Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </>
+          ) : (
+            <>
+              <Button
+                type="submit"
+                disabled={!senhaDigitada}
+              >
+                Salvar
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  setEditando(false);
+                  setSenhaDigitada(false);
+                  reset();
+                }}
+              >
+                Cancelar
+              </Button>
+            </>
+          )}
+        </div>
+      </form>
     </div>
   );
 }
