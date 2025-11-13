@@ -20,7 +20,7 @@ export function DeleteUnitDialog({ unitId }: { unitId: string }) {
 
   const handleUnitDelete = async () => {
     try {
-      await api.delete(`/unit/${unitId}`);
+      await api.delete(`/unit/delete/${unitId}`);
       toast.success("Unidade excluída");
       // refresh units list
       queryClient.invalidateQueries({ queryKey: ["units"] });

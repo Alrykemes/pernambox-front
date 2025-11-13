@@ -41,8 +41,13 @@ export const useAuthStore = create<AuthState>()(
           const user = await get().fetchUser();
           return user;
         } catch (error) {
+<<<<<<< HEAD
           get().clearAuthData();
           throw error;
+=======
+          console.error("Login failed:", error);
+          throw error
+>>>>>>> FEAT/FRONT006
         }
       },
 

@@ -33,7 +33,7 @@ export const roleToNavItems: Record<Role, NavSection> = {
       { title: "Sistema", url: "/dashboard/configuracoes", icon: Settings },
     ],
   },
-
+  
   ADMIN: {
     main: [
       { title: "Home", url: "/dashboard", icon: Home },
