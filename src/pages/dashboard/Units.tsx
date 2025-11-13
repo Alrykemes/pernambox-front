@@ -19,7 +19,7 @@ import {
   type UnitCreateType,
 } from "@/schemas/dashboard/unit-create";
 import { useAuthStore } from "@/stores/auth-store";
-import type { Unit } from "@/types/unit";
+import type { Unit } from "@/types/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin, Plus } from "lucide-react";

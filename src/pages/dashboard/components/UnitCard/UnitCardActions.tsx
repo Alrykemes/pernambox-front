@@ -1,7 +1,7 @@
 import { EditUnitDialog } from "@/pages/dashboard/components/UnitCard/EditUnitDialog";
-import type { Unit } from "@/types/unit";
+import type { Unit } from "@/types/common";
 import { DeleteUnitDialog } from "./DeleteUnitDialog";
-import type { User } from "@/types/user";
+import type { User } from "@/types/common";
 
 export function UnitCardActions({ unit, user }: { unit: Unit, user: User }) {
   const { role } = user;

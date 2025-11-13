@@ -16,7 +16,7 @@ import {
   UserCreateSchema,
   type UserCreateType,
 } from "@/schemas/dashboard/user-create";
-import type { User } from "@/types/user";
+import type { User } from "@/types/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Plus, UsersIcon } from "lucide-react";

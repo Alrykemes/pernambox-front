@@ -18,7 +18,6 @@ import { useAuthStore } from "@/stores/auth-store";
 import type { User } from "@/types/common";
 import { getInitials } from "@/utils/getInitials";
 import { Bell, ChevronsUpDown, CircleUser, LogOut } from "lucide-react";
-import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface UserMenuProps {
@@ -29,16 +28,6 @@ export function UserMenu({ user }: UserMenuProps) {
   const navigate = useNavigate();
   const { isMobile } = useSidebar();
   const logout = useAuthStore((state) => state.logout);
-
-  const handleLogout = useCallback(async () => {
-    try {
-      await logout(true);
-    } catch (err) {
-      console.warn("Logout failed:", err);
-    } finally {
-      navigate("/");
-    }
-  }, [logout, navigate]);
 
   return (
     <SidebarMenu>
@@ -101,7 +90,7 @@ export function UserMenu({ user }: UserMenuProps) {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
-                logout(true);
+                logout();
                 navigate("/");
               }}
             >
