@@ -9,13 +9,13 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, accessToken, isAuthReady } = useAuthStore();
 
-  if (!isAuthReady) {
-    return <FullPageSpinner />;
-  }
-
-  if (!user || !accessToken) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
+  return (
+    !isAuthReady ? (
+      <FullPageSpinner />
+    ) 
+    : (!user || !accessToken) ? (
+      <Navigate to="/" replace />
+    ) 
+    : <>{children}</>
+  );
 }
