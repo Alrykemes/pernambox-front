@@ -68,8 +68,8 @@ export function EditUnitDialog({ unit }: { unit: Unit }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost">
+      <DialogTrigger className="cursor-pointer" asChild>
+        <Button className="cursor-pointer" variant="ghost">
           <SquarePen className="h-5 w-5 cursor-pointer" />
         </Button>
       </DialogTrigger>
@@ -179,9 +179,6 @@ export function EditUnitDialog({ unit }: { unit: Unit }) {
                 disabled={!form.formState.isValid}
               >
                 Salvar
-              </Button>
-              <Button variant="ghost" onClick={() => setOpen(false)}>
-                Cancelar
               </Button>
             </div>
           </div>

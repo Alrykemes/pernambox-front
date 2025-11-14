@@ -60,6 +60,7 @@ export const useAuthStore = create<AuthState>()(
         if (cachedUser) return cachedUser;
         try {
           const { data } = await authApi.get<AuthMeResponse>("/auth/me");
+          console.log(data)
           const user = data;
           if (!user) throw new Error("Usuário não encontrado.");
           set({ user });
@@ -91,7 +92,7 @@ export const useAuthStore = create<AuthState>()(
               email: state.user.email,
               phone: state.user.phone,
               role: state.user.role,
-              avatar: state.user.avatar,
+              imageProfileName: state.user.imageProfileName,
             }
           : null,
       }),

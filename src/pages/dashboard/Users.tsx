@@ -205,7 +205,7 @@ export default function Users() {
 
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-blue-950 hover:bg-blue-900">
+              <Button className="bg-blue-950 hover:bg-blue-900 cursor-pointer">
                 <Plus />
                 Criar Usuário
               </Button>

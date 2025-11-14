@@ -8,7 +8,7 @@ export interface User {
   phone: string;
   active: boolean;
   role: Role;
-  avatar?: string;
+  imageProfileName?: string;
 }
 
 export interface Address {

@@ -1,14 +1,16 @@
-import { HookFormProvider, InputField } from "@/components/form";
+import { HookFormProvider, InputField, InputPasswordField } from "@/components/form";
 import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import api from "@/lib/api";
 import { ChangePasswordSchema, type ChangePasswordType } from "@/schemas/config/password-change";
 import { UserEditMeSchema, type UserEditMeType } from "@/schemas/config/user-edit-me";
 import { useAuthStore } from "@/stores/auth-store";
 import type { User } from "@/types/common";
+import { getInitials } from "@/utils/getInitials";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar } from "@radix-ui/react-avatar";
 import { useMutation } from "@tanstack/react-query";
@@ -21,156 +23,282 @@ export default function UserProfile() {
   const [user, setUser] = useState<User | null>(useAuthStore().user);
   const [editing, setEditing] = useState(false);
   const [passwordEntered, setPasswordEntered] = useState(false);
-  const [modalAberto, setModalAberto] = useState(false);
+  const [imageProfileLink, setImageProfileLink] = useState("");
+  const { setUser: setUserAuth } = useAuthStore();
+
+  const getImageProfileLink = async (imageName: string) => {
+    setImageProfileLink((await api.get(`/files/url/${imageName}`)).data);
+  }
+
+  if (user) {
+    console.log(user.imageProfileName)
+    if (user.imageProfileName) {
+      getImageProfileLink(user.imageProfileName);
+    }
+  }
 
   const formEditMe = useForm({
     resolver: zodResolver(UserEditMeSchema),
     defaultValues: {
+      userId: user?.userId,
       name: user?.name,
       email: user?.email,
       cpf: user?.cpf,
       phone: user?.phone,
       password: "",
+      imageProfile: ""
     },
   });
 
+  const formEditPassword = useForm({
+    resolver: zodResolver(ChangePasswordSchema),
+    defaultValues: {
+      userId: user?.userId,
+      password: "",
+      newPassword: "",
+      confirmNewPassword: undefined
+    },
+  });
 
   const updateUser = useMutation({
     mutationFn: async (payload: {
-      userId?: string;
+      userId: string;
       name?: string;
       cpf?: string;
       email?: string;
       phone?: string;
+      password: string;
+      imageProfile?: string;
+      file?: File | undefined;
     }) => {
-      const { data } = await api.put("/user/update/me", payload);
+
+      if (payload.file) {
+        const formData = new FormData();
+        formData.append("files", payload.file);
+
+        const uploadResponse = await api.post("/files/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        const imageName = uploadResponse.data.fileNames[0];
+
+        payload.imageProfile = imageName;
+        getImageProfileLink(imageName);
+      }
+
+      const payloadUpdate = {
+        ...payload,
+        file: undefined
+      }
+
+      console.log(payloadUpdate);
+
+      const { data } = await api.put("/user/update/me", payloadUpdate);
+      console.log(data);
+      setUserAuth(data);
+      setUser(data);
       return data;
     },
     onSuccess: () => {
       toast.success("Perfil atualizado com sucesso!");
       formEditMe.reset({
+        userId: user?.userId,
         name: user?.name,
         email: user?.email,
         cpf: user?.cpf,
         phone: user?.phone,
         password: "",
+        file: undefined
       });
+
       setEditing(false);
       setPasswordEntered(false);
     },
     onError: (err) => {
       console.error("Erro ao atualizar usuário:", err);
-      // não fechar modal aqui — o UsersTable só fecha quando o onEdit promise resolve
-      // informe o usuário sobre o erro
       toast.error("Erro ao atualizar usuário. Verifique os dados.");
-      throw err; // re-throw para quem chamou (UsersTable) ser notificado se quiser
+      throw err;
     },
   });
 
-  // handler passado para UsersTable.
-  // UsersTable chama onEdit(payload) e espera que retorne uma Promise se for async.
-  const handleEdit = async (payload: UserEditMeType) => {
-    // retorna a promise para que o UsersTable possa await e fechar o dialog só em sucesso
+  const updatePassword = useMutation({
+    mutationFn: async (payload: {
+      userId: string;
+      password: string;
+      newPassword: string;
+    }) => {
+      const { data } = await api.put("/user/update/me", payload);
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Senha Alterada com Sucesso!");
+      formEditPassword.reset({
+        userId: user?.userId,
+        password: "",
+        newPassword: "",
+        confirmNewPassword: ""
+      });
+    },
+    onError: (err) => {
+      console.error("Erro ao atualizar usuário:", err);
+      toast.error("Erro ao atualizar usuário. Verifique os dados.");
+      throw err;
+    },
+  });
+
+  const editInfo = async (payload: UserEditMeType) => {
     return updateUser.mutate(payload);
+  };
+
+  const editPassword = async (payload: ChangePasswordType) => {
+    return updatePassword.mutate(payload);
   };
 
   const password = formEditMe.watch("password");
 
   if (!password && password) setPasswordEntered(true);
 
-
-  // Formulário do modal de alteração de senha
-  const {
-    register: regModal,
-    handleSubmit: handleSubmitModal,
-    reset: resetModal,
-    formState: { errors: errorsModal },
-  } = useForm({
-    resolver: zodResolver(ChangePasswordSchema),
-    defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-      confirmNewPassword: "",
-    },
-  });
-
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 p-6">
+    <div className="flex justify-center bg-gray-50 p-8">
       <Card className="w-full shadow-md">
         <CardHeader className="text-center">
           <CardTitle className="text-lg font-semibold text-gray-800">
-            Perfil do Usuário
+            Configurações da sua Conta
           </CardTitle>
         </CardHeader>
-
         <CardContent>
-          <div className="flex flex-col items-center space-y-3 mb-6">
-            <Avatar className="w-40 h-40">
-              <AvatarImage className="rounded-full" src="https://randomuser.me/api/portraits/women/68.jpg" alt="Foto de perfil" />
-              <AvatarFallback>JA</AvatarFallback>
-            </Avatar>
-            <div className="flex items-center justify-center">
-              <Input
-                id="profileImage"
-                type="file"
-                disabled={true}
-              />
-            </div>
-            <div className="text-center">
-              <p className="font-medium text-gray-800">{user?.name}</p>
-              <p className="text-sm text-gray-500">{user?.email}</p>
-            </div>
-          </div>
-
-          <div className="grid gap-4">
-            <HookFormProvider form={formEditMe} onSubmit={handleEdit} className="space-y-4">
-
-              <div className="grid gap-2">
-                <InputField control={formEditMe.control} disabled={!editing} name="name" label="Nome e Sobrenome" id="name" defaultValue={user?.name} />
-              </div>
-
-              <div className="grid gap-2">
-                <InputField control={formEditMe.control} disabled={!editing} name="email" label="Email" defaultValue={user?.email} />
-              </div>
-
-              <div className="grid gap-2">
-                <InputField control={formEditMe.control} disabled={!editing} name="cpf" label="CPF" defaultValue={user?.cpf} />
-              </div>
-
-              <div className="grid gap-2">
-                <InputField control={formEditMe.control} disabled={!editing} name="phone" label="Número de Telefone" defaultValue={user?.phone} />
-              </div>
-
-              {editing && (
-                <div className="grid gap-2">
-                  <InputField control={formEditMe.control} disabled={!editing} name="password" label="Confime com sua senha" defaultValue="*********" />
+          <Tabs defaultValue="profile-info" className="gap-4 w-full items-center justify-center">
+            <TabsList className="h-14 lg:w-154 sm:w-102">
+              <TabsTrigger value="profile-info">Informações Pessoais</TabsTrigger>
+              <TabsTrigger value="profile-security">Segurança</TabsTrigger>
+            </TabsList>
+            <TabsContent value="profile-info">
+              <div className="flex flex-col items-center space-y-3 mb-6">
+                <div className="text-center">
+                  <p className="font-medium text-gray-800">Foto do Perfil</p>
                 </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-2">
-                {!editing ? (
-                  <Button className="cursor-pointer bg-gray-500" onClick={() => { setEditing(true) }}>
-                    Editar
-                  </Button>
-                ) :
-                  <Button className="cursor-pointer bg-red-500" onClick={() => { /* Meter uma função de rest aqui */setEditing(false) }}>
-                    Cancelar
-                  </Button>
-                }
-                <Button className="cursor-pointer bg-green-500" disabled={!editing} onClick={() => { /* Meter uma função de Submit */ }}>
-                  Salvar
-                </Button>
+                <Avatar className="w-40 h-40">
+                  {imageProfileLink.length > 0 ? <AvatarImage className="rounded-full" src={imageProfileLink} alt="Foto de perfil" />
+                    : <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>}
+                </Avatar>
               </div>
-            </HookFormProvider>
+              <HookFormProvider form={formEditMe} onSubmit={editInfo} className="space-y-4 lg:w-250">
+                <div className="grid gap-2">
+                  <FormField
+                    control={formEditMe.control}
+                    name="file"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Escolha sua Foto do Perfil</FormLabel>
 
-            <div className="grid gap-2">
-              <Button className="cursor-pointer">
-                Alterar Senha <LockKeyhole />
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                        <FormControl>
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            disabled={!editing}
+                            onChange={(e) => field.onChange(e.target.files?.[0] ?? null)}
+                          />
+                        </FormControl>
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <InputField control={formEditMe.control} disabled={!editing} name="name" label="Nome e Sobrenome" defaultValue={user?.name} />
+                </div>
+
+                <div className="grid gap-2">
+                  <InputField control={formEditMe.control} disabled={!editing} name="email" label="Email" defaultValue={user?.email} />
+                </div>
+
+                <div className="grid gap-2">
+                  <InputField control={formEditMe.control} disabled={!editing} name="cpf" label="CPF" defaultValue={user?.cpf} />
+                </div>
+
+                <div className="grid gap-2">
+                  <InputField control={formEditMe.control} disabled={!editing} name="phone" label="Número de Telefone" defaultValue={user?.phone} />
+                </div>
+
+                {editing && (
+                  <div className="grid gap-2">
+                    <InputPasswordField
+                      control={formEditMe.control}
+                      name="password"
+                      label="Confime com sua senha"
+                      placeholder="••••••••"
+                      type="password"
+                      autoComplete="current-password"
+                    />
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-2">
+                  {!editing ? (
+                    <Button className="cursor-pointer bg-gray-500" onClick={() => { setEditing(true) }}>
+                      Editar
+                    </Button>
+                  ) :
+                    <Button className="cursor-pointer bg-red-500" onClick={() => { /* Meter uma função de rest aqui */setEditing(false) }}>
+                      Cancelar
+                    </Button>
+                  }
+                  <Button className="cursor-pointer bg-green-500" disabled={!editing} onClick={() => { /* Meter uma função de Submit */ }}>
+                    Salvar
+                  </Button>
+                </div>
+              </HookFormProvider>
+            </TabsContent>
+
+            <TabsContent value="profile-security">
+              <HookFormProvider form={formEditPassword} onSubmit={editPassword} className="space-y-4 lg:w-250">
+                {/* current password */}
+                <div>
+                  <InputPasswordField
+                    control={formEditPassword.control}
+                    name="password"
+                    label="Senha Atual"
+                    placeholder="••••••••"
+                    type="password"
+                  />
+                </div>
+
+                {/* new password */}
+                <div>
+                  <InputPasswordField
+                    control={formEditPassword.control}
+                    name="newPassword"
+                    label="Nova Senha"
+                    placeholder="••••••••"
+                    type="password"
+                  />
+                </div>
+
+                {/* confirm new password */}
+                <div>
+                  <InputPasswordField
+                    control={formEditPassword.control}
+                    name="confirmNewPassword"
+                    label="Confime sua Nova senha"
+                    placeholder="••••••••"
+                    type="password"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button className="cursor-pointer">
+                    Alterar Senha <LockKeyhole />
+                  </Button>
+                </div>
+              </HookFormProvider>
+            </TabsContent>
+          </Tabs>
+        </CardContent >
+      </Card >
     </div>
   );
 }
