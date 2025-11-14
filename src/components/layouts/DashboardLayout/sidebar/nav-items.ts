@@ -21,6 +21,19 @@ export type NavSection = {
 };
 
 export const roleToNavItems: Record<Role, NavSection> = {
+  ADMIN_MASTER: {
+    main: [
+      { title: "Home", url: "/dashboard", icon: Home },
+      { title: "Unidades", url: "/dashboard/unidades", icon: MapPinHouse },
+      { title: "Estoque", url: "/dashboard/estoque", icon: Warehouse },
+      { title: "Produtos", url: "/dashboard/produtos", icon: Handbag },
+      { title: "Usuários", url: "/dashboard/usuarios", icon: Users },
+    ],
+    settings: [
+      { title: "Sistema", url: "/dashboard/configuracoes", icon: Settings },
+    ],
+  },
+  
   ADMIN: {
     main: [
       { title: "Home", url: "/dashboard", icon: Home },

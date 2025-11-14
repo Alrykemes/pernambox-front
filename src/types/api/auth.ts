@@ -1,4 +1,5 @@
 import type { Role, User } from "@/types/common";
+import "axios";
 
 export type LoginResponse = {
   userId: string;
@@ -21,3 +22,9 @@ export type ValidateOTPCodeResponse = {
 };
 
 export type NewPasswordResponse = {};
+
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    _isRefreshRequest?: boolean;
+  }
+}

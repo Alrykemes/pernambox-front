@@ -34,15 +34,15 @@ export function ResponsibleSelect<T extends FieldValues>({
   name,
   label = "Responsável",
   placeholder = "Selecione um responsável",
-  allowedRoles = ["MASTER_ADM", "UNIT_ADM"],
+  allowedRoles = ["ADMIN_MASTER"],
   className,
-  usersEndpoint = "/user/all",
+  usersEndpoint = "/user/all/admins-masters",
 }: ResponsibleSelectProps<T>) {
   const { data, isLoading, isError } = useQuery<UserDto[], Error>({
     queryKey: ["user", allowedRoles],
     queryFn: async () => {
       const res = await api.get<UserDto[]>(usersEndpoint);
-      console.log(res);
+      // console.log(res);
       const json = res.data as UserDto[];
       return json.filter((u) => allowedRoles.includes(u.role ?? ""));
     },
@@ -54,7 +54,11 @@ export function ResponsibleSelect<T extends FieldValues>({
       {(field) => (
         <Select
           value={field.value ?? ""}
-          onValueChange={(val) => field.onChange(val)}
+          onValueChange={(val) => {
+            field.onChange(val)
+            console.log(field.value)
+          } 
+        }
         >
           <SelectTrigger className={className ?? "h-12 w-[320px]"}>
             <SelectValue placeholder={placeholder} />

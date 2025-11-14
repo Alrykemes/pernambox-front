@@ -48,12 +48,13 @@ api.interceptors.response.use(
 
     if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+
+      if (originalRequest.url === "/auth/login" && originalRequest.method === "post") {
+        console.log("rejeitando erro de login");
+        return Promise.reject(error);
+      }
+
       try {
-
-        if (originalRequest.url === "/auth/login" && originalRequest.method === "post") {
-          return Promise.reject(error);
-        }
-
         console.log("axios: tentando refresh token");
         const { data } = await authApi.get("/auth/refresh-token", {
           withCredentials: true,
@@ -77,7 +78,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export default api;

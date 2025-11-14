@@ -13,27 +13,58 @@ export function AuthInitializer({ children }: { children: ReactNode }) {
   } = useAuthStore();
 
   useEffect(() => {
-    const tryRefresh = async () => {
-      const hasSession = sessionStorage.getItem("sessionActive");
-      if (accessToken) return;
-      if (!hasSession) return;
+    const initialize = async () => {
+      // ✅ Aguarda a reidratação manualmente
+      const waitForHydration = async () => {
+        if (useAuthStore.persist.hasHydrated()) return;
+        await new Promise<void>((resolve) => {
+          const unsub = useAuthStore.persist.onFinishHydration(() => {
+            unsub();
+            resolve();
+          });
+        });
+      };
 
-      try {
-        const { data } = await authApi.get("/auth/refresh-token");
-        setAccessToken(data.token);
-        if (!user) {
-          const user = await fetchUser();
-          if (user) setUser(user);
+      await waitForHydration();
+
+      const hasSession = sessionStorage.getItem("sessionActive");
+
+      // 🔹 Caso 1: já há token
+      if (accessToken) {
+        try {
+          if (!user) {
+            const fetchedUser = await fetchUser();
+            if (fetchedUser) setUser(fetchedUser);
+          }
+        } catch {
+          // ignore refresh errors
+        } finally {
+          setAuthReady(true);
         }
-      } catch (err) {
-        // ignore refresh errors
-      } finally {
-        setAuthReady(true);
+        return;
       }
+
+      // 🔹 Caso 2: há sessão mas sem token
+      if (hasSession && !accessToken) {
+        try {
+          const { data } = await authApi.get("/auth/refresh-token");
+          setAccessToken(data.token);
+          const fetchedUser = await fetchUser();
+          if (fetchedUser) setUser(fetchedUser);
+        } catch {
+          // ignore refresh errors
+        } finally {
+          setAuthReady(true);
+        }
+        return;
+      }
+
+      // 🔹 Caso 3: sem sessão nem token
+      setAuthReady(true);
     };
 
-    tryRefresh();
-  }, [accessToken, setAccessToken, setUser, fetchUser, setAuthReady, user]);
+    initialize();
+  }, [accessToken, user, fetchUser, setUser, setAccessToken, setAuthReady]);
 
   return children;
 }
