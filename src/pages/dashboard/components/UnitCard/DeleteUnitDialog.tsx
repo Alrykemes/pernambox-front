@@ -20,7 +20,7 @@ export function DeleteUnitDialog({ unitId }: { unitId: string }) {
 
   const handleUnitDelete = async () => {
     try {
-      await api.delete(`/unit/${unitId}`);
+      await api.delete(`/unit/delete/${unitId}`);
       toast.success("Unidade excluída");
       // refresh units list
       queryClient.invalidateQueries({ queryKey: ["units"] });
@@ -32,8 +32,8 @@ export function DeleteUnitDialog({ unitId }: { unitId: string }) {
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="ghost">
+      <AlertDialogTrigger className="cursor-pointer" asChild>
+        <Button className="cursor-pointer" variant="ghost">
           <Trash className="h-5 w-5 cursor-pointer" />
         </Button>
       </AlertDialogTrigger>
@@ -46,8 +46,8 @@ export function DeleteUnitDialog({ unitId }: { unitId: string }) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleUnitDelete}>
+          <AlertDialogCancel className="cursor-pointer" >Cancelar</AlertDialogCancel>
+          <AlertDialogAction className="cursor-pointer" onClick={handleUnitDelete}>
             Continue
           </AlertDialogAction>
         </AlertDialogFooter>

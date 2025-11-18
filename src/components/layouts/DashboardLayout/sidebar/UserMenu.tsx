@@ -14,11 +14,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import api from "@/lib/api";
 import { useAuthStore } from "@/stores/auth-store";
 import type { User } from "@/types/common";
 import { getInitials } from "@/utils/getInitials";
 import { Bell, ChevronsUpDown, CircleUser, LogOut } from "lucide-react";
-import { useCallback } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface UserMenuProps {
@@ -29,31 +30,31 @@ export function UserMenu({ user }: UserMenuProps) {
   const navigate = useNavigate();
   const { isMobile } = useSidebar();
   const logout = useAuthStore((state) => state.logout);
+  const [imageProfileLink, setImageProfileLink] = useState("");
 
-  const handleLogout = useCallback(async () => {
-    try {
-      await logout(true);
-    } catch (err) {
-      console.warn("Logout failed:", err);
-    } finally {
-      navigate("/");
+  const getImageProfileLink = async (imageName: string) => {
+    setImageProfileLink((await api.get(`/files/url/${imageName}`)).data);
+  }
+
+  if (user) {
+    console.log(user.imageProfileName)
+    if (user.imageProfileName) {
+      getImageProfileLink(user.imageProfileName);
     }
-  }, [logout, navigate]);
+  }
 
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
+      <SidebarMenuItem >
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger className="cursor-pointer" asChild>
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">
-                  {getInitials(user.name)}
-                </AvatarFallback>
+              <Avatar className="w-8 h-8">
+                {imageProfileLink.length > 0 ? <AvatarImage className="rounded-full" src={imageProfileLink} alt="Foto de perfil" />
+                  : <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>}
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -70,11 +71,9 @@ export function UserMenu({ user }: UserMenuProps) {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">
-                    {getInitials(user.name)}
-                  </AvatarFallback>
+                <Avatar className="w-8 h-8">
+                  {imageProfileLink.length > 0 ? <AvatarImage className="rounded-full" src={imageProfileLink} alt="Foto de perfil" />
+                    : <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>}
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -84,17 +83,31 @@ export function UserMenu({ user }: UserMenuProps) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={
+                  () => {
+                    navigate("/configurações/perfil");
+                  }
+                }>
                 <CircleUser />
-                Perfil
+                Minha Conta
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+              >
                 <Bell />
                 Notificações
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => {
+                logout();
+                navigate("/");
+              }}
+            >
               <LogOut />
               Sair
             </DropdownMenuItem>

@@ -4,6 +4,7 @@ interface DashboardCardProps {
   title: string;
   content: string;
   footer?: string;
+  footerColor?: string;
   icon?: React.ReactNode;
 }
 
@@ -11,6 +12,7 @@ export function DashboardCard({
   title,
   content,
   footer,
+  footerColor = "green",
   icon,
 }: DashboardCardProps) {
   return (
@@ -21,7 +23,7 @@ export function DashboardCard({
           {icon && icon}
         </div>
         <span className="text-xl font-bold">{content}</span>
-        <span className="truncate text-sm font-medium text-green-500">
+        <span className={`truncate text-sm font-medium text-${footerColor}-500`}>
           {footer}
         </span>
       </CardContent>
