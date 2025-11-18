@@ -6,11 +6,16 @@ import { dashboardRoutes } from "@/routes/dashboard.routes";
 import { configRoutes } from "@/routes/config.routes";
 import type { RouteObject } from "react-router-dom";
 import { passwordResetRoutes } from "./password-reset.routes";
+import { PublicRoute } from "@/components/PublicRoute";
 
 export const routes: RouteObject[] = [
   {
     path: "/",
-    element: <CenteredLayout />,
+    element: (
+      <PublicRoute>
+        <CenteredLayout />
+      </PublicRoute>
+    ),
     children: [...authRoutes],
   },
   {

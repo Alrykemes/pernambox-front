@@ -1,4 +1,4 @@
-import { authApi } from "@/lib/authApi";
+import { noAuthApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth-store";
 import { type ReactNode, useEffect } from "react";
 
@@ -47,7 +47,7 @@ export function AuthInitializer({ children }: { children: ReactNode }) {
       // 🔹 Caso 2: há sessão mas sem token
       if (hasSession && !accessToken) {
         try {
-          const { data } = await authApi.get("/auth/refresh-token");
+          const { data } = await noAuthApi.get("/auth/refresh-token");
           setAccessToken(data.token);
           const fetchedUser = await fetchUser();
           if (fetchedUser) setUser(fetchedUser);
@@ -64,7 +64,7 @@ export function AuthInitializer({ children }: { children: ReactNode }) {
     };
 
     initialize();
-  }, [accessToken, user, fetchUser, setUser, setAccessToken, setAuthReady]);
+  }, [accessToken, setAuthReady]);
 
   return children;
 }
