@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import api from "@/lib/api";
+import { authApi } from "@/lib/api";
 import {
   UnitCreateSchema,
   type UnitCreateType,
@@ -52,7 +52,7 @@ export function EditUnitDialog({ unit }: { unit: Unit }) {
 
   const onSubmit = async (data: UnitCreateType) => {
     try {
-      const response = await api.patch(`/unit/update/${unit.id}`, data);
+      const response = await authApi.patch(`/unit/update/${unit.id}`, data);
       if (response.status === 200) {
         toast.success("Unidade atualizada com sucesso");
         setOpen(false);

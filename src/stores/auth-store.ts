@@ -57,10 +57,11 @@ export const useAuthStore = create<AuthState>()(
 
       fetchUser: async () => {
         const cachedUser = get().user;
-        if (cachedUser) return cachedUser;
+        if (cachedUser && cachedUser.cpf) return cachedUser;
         try {
           const { data } = await authApi.get<AuthMeResponse>("/auth/me");
           const user = data;
+          console.log(user);
           if (!user) throw new Error("Usuário não encontrado.");
           set({ user });
           return user;
@@ -89,7 +90,6 @@ export const useAuthStore = create<AuthState>()(
               userId: state.user.userId,
               name: state.user.name,
               email: state.user.email,
-              phone: state.user.phone,
               role: state.user.role,
               imageProfileName: state.user.imageProfileName,
             }

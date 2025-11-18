@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import api from "@/lib/api";
+import { useProfilePhoto } from "@/hooks/use-profile-photo";
+import { authApi } from "@/lib/api";
 import { ChangePasswordSchema, type ChangePasswordType } from "@/schemas/config/password-change";
 import { UserEditMeSchema, type UserEditMeType } from "@/schemas/config/user-edit-me";
 import { useAuthStore } from "@/stores/auth-store";
@@ -15,40 +16,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar } from "@radix-ui/react-avatar";
 import { useMutation } from "@tanstack/react-query";
 import { LockKeyhole } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function UserProfile() {
-  const [user, setUser] = useState<User | null>(useAuthStore().user);
+  const {user, setUser} = useAuthStore.getState();
   const [editing, setEditing] = useState(false);
   const [passwordEntered, setPasswordEntered] = useState(false);
-  const [imageProfileLink, setImageProfileLink] = useState("");
   const { setUser: setUserAuth } = useAuthStore();
-
-  const getImageProfileLink = async (imageName: string) => {
-    setImageProfileLink((await api.get(`/files/url/${imageName}`)).data);
-  }
-
-  if (user) {
-    console.log(user.imageProfileName)
-    if (user.imageProfileName) {
-      getImageProfileLink(user.imageProfileName);
-    }
-  }
-
-  const formEditMe = useForm({
-    resolver: zodResolver(UserEditMeSchema),
-    defaultValues: {
-      userId: user?.userId,
-      name: user?.name,
-      email: user?.email,
-      cpf: user?.cpf,
-      phone: user?.phone,
-      password: "",
-      imageProfile: ""
-    },
-  });
+  const profilePhotoUrl = useProfilePhoto(user?.imageProfileName ?? null);
+  const hasPhoto = Boolean(profilePhotoUrl);
 
   const formEditPassword = useForm({
     resolver: zodResolver(ChangePasswordSchema),
@@ -57,6 +35,19 @@ export default function UserProfile() {
       password: "",
       newPassword: "",
       confirmNewPassword: undefined
+    },
+  });
+
+  const formEditMe = useForm({
+    resolver: zodResolver(UserEditMeSchema),
+    defaultValues: {
+      userId: user?.userId ?? '',
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      cpf: user?.cpf ?? '',
+      phone: user?.phone ?? '',
+      password: "",
+      imageProfile: ""
     },
   });
 
@@ -76,7 +67,7 @@ export default function UserProfile() {
         const formData = new FormData();
         formData.append("files", payload.file);
 
-        const uploadResponse = await api.post("/files/upload", formData, {
+        const uploadResponse = await authApi.post("/files/upload", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -85,7 +76,6 @@ export default function UserProfile() {
         const imageName = uploadResponse.data.fileNames[0];
 
         payload.imageProfile = imageName;
-        getImageProfileLink(imageName);
       }
 
       const payloadUpdate = {
@@ -95,7 +85,7 @@ export default function UserProfile() {
 
       console.log(payloadUpdate);
 
-      const { data } = await api.put("/user/update/me", payloadUpdate);
+      const { data } = await authApi.put("/user/update/me", payloadUpdate);
       console.log(data);
       setUserAuth(data);
       setUser(data);
@@ -129,7 +119,7 @@ export default function UserProfile() {
       password: string;
       newPassword: string;
     }) => {
-      const { data } = await api.put("/user/update/me", payload);
+      const { data } = await authApi.put("/user/update/me", payload);
       return data;
     },
     onSuccess: () => {
@@ -180,11 +170,11 @@ export default function UserProfile() {
                   <p className="font-medium text-gray-800">Foto do Perfil</p>
                 </div>
                 <Avatar className="w-40 h-40">
-                  {imageProfileLink.length > 0 ? <AvatarImage className="rounded-full" src={imageProfileLink} alt="Foto de perfil" />
+                  {hasPhoto ? <AvatarImage className="rounded-full" src={profilePhotoUrl ?? ''} alt="Foto de perfil" />
                     : <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>}
                 </Avatar>
               </div>
-              <HookFormProvider form={formEditMe} onSubmit={editInfo} className="space-y-4 lg:w-250">
+              <HookFormProvider form={formEditMe} onSubmit={editInfo} className="space-y-4 md:w-110 lg:w-180 xl:w-230">
                 <div className="grid gap-2">
                   <FormField
                     control={formEditMe.control}
@@ -255,7 +245,7 @@ export default function UserProfile() {
             </TabsContent>
 
             <TabsContent value="profile-security">
-              <HookFormProvider form={formEditPassword} onSubmit={editPassword} className="space-y-4 lg:w-250">
+              <HookFormProvider form={formEditPassword} onSubmit={editPassword} className="space-y-4 md:w-110 lg:w-180 xl:w-230">
                 {/* current password */}
                 <div>
                   <InputPasswordField

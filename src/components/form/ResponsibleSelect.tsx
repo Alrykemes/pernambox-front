@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import api from "@/lib/api";
+import { authApi } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import type { Control, FieldValues, Path } from "react-hook-form";
 
@@ -41,7 +41,7 @@ export function ResponsibleSelect<T extends FieldValues>({
   const { data, isLoading, isError } = useQuery<UserDto[], Error>({
     queryKey: ["user", allowedRoles],
     queryFn: async () => {
-      const res = await api.get<UserDto[]>(usersEndpoint);
+      const res = await authApi.get<UserDto[]>(usersEndpoint);
       // console.log(res);
       const json = res.data as UserDto[];
       return json.filter((u) => allowedRoles.includes(u.role ?? ""));
@@ -57,8 +57,8 @@ export function ResponsibleSelect<T extends FieldValues>({
           onValueChange={(val) => {
             field.onChange(val)
             console.log(field.value)
-          } 
-        }
+          }
+          }
         >
           <SelectTrigger className={className ?? "h-12 w-[320px]"}>
             <SelectValue placeholder={placeholder} />

@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import api from "@/lib/api";
+import { authApi } from "@/lib/api";
 import { queryClient } from "@/lib/react-query";
 import { DashboardCard } from "@/pages/dashboard/components/DashboardCard";
 import { UnitCard } from "@/pages/dashboard/components/UnitCard/UnitCard";
@@ -41,19 +41,19 @@ export default function UnitPage() {
   const { data: units } = useQuery<Unit[]>({
     queryKey: ["units"],
     queryFn: async () => {
-      const { data } = await api.get("/unit");
+      const { data } = await authApi.get("/unit");
       return data;
     },
   });
 
   const { data: unitsStats, isLoading: statsLoading } = useQuery<UnitStats>({
-      queryKey: ["unitsStats"],
-      queryFn: async () => {
-        const response = await api.get("/unit/info/stats");
-        return response.data as UnitStats;
-      },
-      staleTime: 1000 * 30,
-    });
+    queryKey: ["unitsStats"],
+    queryFn: async () => {
+      const response = await authApi.get("/unit/info/stats");
+      return response.data as UnitStats;
+    },
+    staleTime: 1000 * 30,
+  });
 
   const unitsArray = units ?? [];
 
@@ -80,7 +80,7 @@ export default function UnitPage() {
 
   const onSubmit = async (data: UnitCreateType) => {
     try {
-      const response = await api.post("/unit/create", data);
+      const response = await authApi.post("/unit/create", data);
       if (response.status === 201 || response.data.success) {
         toast.success("Unidade criada com sucesso!");
         setOpen(false);
@@ -129,7 +129,7 @@ export default function UnitPage() {
           </h4>
         </div>
         <div className="flex items-center gap-4 pt-6 pb-2">
-        
+
           {user?.role === "ADMIN_MASTER" && (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>

@@ -10,7 +10,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import api from "@/lib/api";
+import { authApi } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
 import { toast } from "sonner";
@@ -20,7 +20,7 @@ export function DeleteUnitDialog({ unitId }: { unitId: string }) {
 
   const handleUnitDelete = async () => {
     try {
-      await api.delete(`/unit/delete/${unitId}`);
+      await authApi.delete(`/unit/delete/${unitId}`);
       toast.success("Unidade excluída");
       // refresh units list
       queryClient.invalidateQueries({ queryKey: ["units"] });
