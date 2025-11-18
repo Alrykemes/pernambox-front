@@ -1,4 +1,4 @@
-import { authApi } from "@/lib/authApi";
+import { authApi } from "@/lib/api";
 import type { LoginType } from "@/pages/auth/Login";
 import type { AuthMeResponse, LoginResponse } from "@/types/api/auth";
 import type { User } from "@/types/common";
@@ -60,7 +60,6 @@ export const useAuthStore = create<AuthState>()(
         if (cachedUser) return cachedUser;
         try {
           const { data } = await authApi.get<AuthMeResponse>("/auth/me");
-          console.log(data)
           const user = data;
           if (!user) throw new Error("Usuário não encontrado.");
           set({ user });
