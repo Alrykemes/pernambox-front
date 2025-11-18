@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import api from "@/lib/api";
+import { authApi } from "@/lib/api";
 import { queryClient } from "@/lib/react-query";
 import {
   UserCreateSchema,
@@ -50,7 +50,7 @@ export default function Users() {
   const { data: userStats, isLoading: statsLoading } = useQuery<UserStats>({
     queryKey: ["userStats"],
     queryFn: async () => {
-      const { data } = await api.get("/user/stats");
+      const { data } = await authApi.get("/user/stats");
       return data as UserStats;
     },
     staleTime: 1000 * 30,
@@ -64,7 +64,7 @@ export default function Users() {
   >({
     queryKey: ["users", page, size] as const,
     queryFn: async () => {
-      const { data } = await api.get(`/user/all?page=${page}&size=${size}`);
+      const { data } = await authApi.get(`/user/all?page=${page}&size=${size}`);
       return data as PageUserResponseDto;
     },
     staleTime: 1000 * 10,
@@ -87,7 +87,7 @@ export default function Users() {
 
   const createUser = useMutation({
     mutationFn: async (payload: UserCreateType) => {
-      const res = await api.post("/user/create", payload);
+      const res = await authApi.post("/user/create", payload);
       return res;
     },
     onSuccess: (res) => {
@@ -105,7 +105,7 @@ export default function Users() {
 
   const deleteUser = useMutation({
     mutationFn: async (userId: string) => {
-      return api.delete(`/user/${userId}`);
+      return authApi.delete(`/user/${userId}`);
     },
     onSuccess: () => {
       toast.success("Usuário excluído");
@@ -135,7 +135,7 @@ export default function Users() {
       role: string;
       active: boolean;
     }) => {
-      const { data } = await api.put("/user/admin/update", payload);
+      const { data } = await authApi.put("/user/admin/update", payload);
       return data;
     },
     onSuccess: () => {
@@ -173,22 +173,22 @@ export default function Users() {
       <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
           title="Total de Usuários"
-          icon={<UsersIcon className="h-4 w-4 text-blue-500"/>}
+          icon={<UsersIcon className="h-4 w-4 text-blue-500" />}
           content={userStats ? String(userStats.total) : "Carregando..."}
         />
         <DashboardCard
           title="Total de Administradores"
-          icon={<UsersIcon className="h-4 w-4 text-purple-500"/>}
+          icon={<UsersIcon className="h-4 w-4 text-purple-500" />}
           content={userStats ? String(userStats.admins) : "Carregando..."}
         />
         <DashboardCard
           title="Total de Usuários Ativos"
-          icon={<UsersIcon className="h-4 w-4 text-green-500"/>}
+          icon={<UsersIcon className="h-4 w-4 text-green-500" />}
           content={userStats ? String(userStats.actives) : "Carregando..."}
         />
         <DashboardCard
           title="Total de Usuários Inativos"
-          icon={<UsersIcon className="h-4 w-4 text-red-500"/>}
+          icon={<UsersIcon className="h-4 w-4 text-red-500" />}
           content={userStats ? String(userStats.deactiveds) : "Carregando..."}
         />
       </div>

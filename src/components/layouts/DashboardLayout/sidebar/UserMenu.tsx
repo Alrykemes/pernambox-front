@@ -14,12 +14,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import api from "@/lib/api";
+import { useProfilePhoto } from "@/hooks/use-profile-photo";
 import { useAuthStore } from "@/stores/auth-store";
 import type { User } from "@/types/common";
 import { getInitials } from "@/utils/getInitials";
 import { Bell, ChevronsUpDown, CircleUser, LogOut } from "lucide-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface UserMenuProps {
@@ -28,20 +27,10 @@ interface UserMenuProps {
 
 export function UserMenu({ user }: UserMenuProps) {
   const navigate = useNavigate();
+  const { logout } = useAuthStore();
   const { isMobile } = useSidebar();
-  const logout = useAuthStore((state) => state.logout);
-  const [imageProfileLink, setImageProfileLink] = useState("");
-
-  const getImageProfileLink = async (imageName: string) => {
-    setImageProfileLink((await api.get(`/files/url/${imageName}`)).data);
-  }
-
-  if (user) {
-    console.log(user.imageProfileName)
-    if (user.imageProfileName) {
-      getImageProfileLink(user.imageProfileName);
-    }
-  }
+  const profilePhotoUrl = useProfilePhoto(user?.imageProfileName ?? null);
+  const hasPhoto = Boolean(profilePhotoUrl);
 
   return (
     <SidebarMenu>
@@ -53,7 +42,7 @@ export function UserMenu({ user }: UserMenuProps) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="w-8 h-8">
-                {imageProfileLink.length > 0 ? <AvatarImage className="rounded-full" src={imageProfileLink} alt="Foto de perfil" />
+                {hasPhoto ? <AvatarImage className="rounded-full" src={profilePhotoUrl ?? ''} alt="Foto de perfil" />
                   : <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>}
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -72,7 +61,7 @@ export function UserMenu({ user }: UserMenuProps) {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="w-8 h-8">
-                  {imageProfileLink.length > 0 ? <AvatarImage className="rounded-full" src={imageProfileLink} alt="Foto de perfil" />
+                  {hasPhoto ? <AvatarImage className="rounded-full" src={profilePhotoUrl ?? ''} alt="Foto de perfil" />
                     : <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>}
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
