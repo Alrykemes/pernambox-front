@@ -21,25 +21,12 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function UserProfile() {
-  const [user, setUser] = useState<User | null>(useAuthStore().user);
+  const {user, setUser} = useAuthStore.getState();
   const [editing, setEditing] = useState(false);
   const [passwordEntered, setPasswordEntered] = useState(false);
   const { setUser: setUserAuth } = useAuthStore();
   const profilePhotoUrl = useProfilePhoto(user?.imageProfileName ?? null);
   const hasPhoto = Boolean(profilePhotoUrl);
-
-  const formEditMe = useForm({
-    resolver: zodResolver(UserEditMeSchema),
-    defaultValues: {
-      userId: user?.userId,
-      name: user?.name,
-      email: user?.email,
-      cpf: user?.cpf,
-      phone: user?.phone,
-      password: "",
-      imageProfile: ""
-    },
-  });
 
   const formEditPassword = useForm({
     resolver: zodResolver(ChangePasswordSchema),
@@ -50,6 +37,33 @@ export default function UserProfile() {
       confirmNewPassword: undefined
     },
   });
+
+  const formEditMe = useForm({
+    resolver: zodResolver(UserEditMeSchema),
+    defaultValues: {
+      userId: user?.userId ?? '',
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      cpf: user?.cpf ?? '',
+      phone: user?.phone ?? '',
+      password: "",
+      imageProfile: ""
+    },
+  });
+
+  useEffect(() => {
+    console.log(user?.cpf);
+    formEditMe.reset({
+      userId: user?.userId ?? '',
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      cpf: user?.cpf ?? '',
+      phone: user?.phone ?? '',
+      password: "",
+      imageProfile: ""
+    }
+    )
+  }, [user]);
 
   const updateUser = useMutation({
     mutationFn: async (payload: {

@@ -37,6 +37,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useProfilePhoto } from "@/hooks/use-profile-photo";
+import { AvatarFallback, Avatar, AvatarImage } from "@/components/ui/avatar";
 
 const UserUpdateSchema = z.object({
   userId: z.string().nonempty(),
@@ -44,7 +46,7 @@ const UserUpdateSchema = z.object({
   cpf: z.string().length(11, "O CPF deve conter 11 dígitos"),
   email: z.email("Email inválido"),
   phone: z.string().min(8).max(15),
-  role: z.enum(["ADMIN", "USER"]),
+  role: z.enum(["ADMIN_MASTER", "ADMIN", "USER"]),
   active: z.enum(["true", "false"]),
 });
 type UserUpdateType = z.infer<typeof UserUpdateSchema>;
@@ -77,7 +79,6 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [submittingEdit, setSubmittingEdit] = useState(false);
-
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const editForm = useForm<UserUpdateType>({
@@ -101,7 +102,7 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
       cpf: u.cpf ?? "",
       email: u.email ?? "",
       phone: u.phone ?? "",
-      role: (u.role as "ADMIN" | "USER") ?? "USER",
+      role: (u.role as "ADMIN_MASTER" | "ADMIN" | "USER") ?? "USER",
       active: u.active ? "true" : "false",
     });
     setEditingUserId(u.userId);
@@ -194,108 +195,95 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
                   Nenhum usuário encontrado.
                 </TableCell>
               </TableRow>
-            ) : (
-              users.map((u) => (
-                <TableRow key={u.userId}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      {u.avatar ? (
-                        <img
-                          src={u.avatar}
-                          alt={u.name}
-                          className="h-10 w-10 rounded-full object-cover"
-                          onError={(e) => {
-                            (
-                              e.currentTarget as HTMLImageElement
-                            ).style.display = "none";
-                          }}
-                        />
-                      ) : (
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-sm font-medium text-slate-700">
-                          {getInitials(u.name)}
-                        </div>
-                      )}
+            ) : (users.map((u) => (
+              <TableRow key={u.userId}>
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                      <Avatar className="w-8 h-8">
+                        {Boolean(useProfilePhoto(u?.imageProfileName ?? null)) ? <AvatarImage className="rounded-full" src={useProfilePhoto(u?.imageProfileName ?? null) ?? ''} alt="Foto de perfil" />
+                          : <AvatarFallback>{getInitials(u?.name)}</AvatarFallback>}
+                      </Avatar>
 
-                      <div className="flex flex-col text-left">
-                        <span className="font-medium">{u.name}</span>
-                        <span className="text-muted-foreground text-xs">
-                          {u.cpf ?? ""}
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{u.email}</span>
+                    <div className="flex flex-col text-left">
+                      <span className="font-medium">{u.name}</span>
                       <span className="text-muted-foreground text-xs">
-                        {u.phone ?? ""}
+                        {u.cpf ?? ""}
                       </span>
                     </div>
-                  </TableCell>
+                  </div>
+                </TableCell>
 
-                  <TableCell>
-                    <div className="inline-block rounded-md bg-slate-100 px-2 py-1 text-sm font-medium">
-                      {u.role}
+                <TableCell>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{u.email}</span>
+                    <span className="text-muted-foreground text-xs">
+                      {u.phone ?? ""}
+                    </span>
+                  </div>
+                </TableCell>
+
+                <TableCell>
+                  <div className="inline-block rounded-md bg-slate-100 px-2 py-1 text-sm font-medium">
+                    {u.role}
+                  </div>
+                </TableCell>
+
+                <TableCell>
+                  {u.active ? (
+                    <div className="inline-block rounded-md bg-green-100 px-2 py-1 text-sm font-medium text-green-900">
+                      Ativo
                     </div>
-                  </TableCell>
-
-                  <TableCell>
-                    {u.active ? (
-                      <div className="inline-block rounded-md bg-green-100 px-2 py-1 text-sm font-medium text-green-900">
-                        Ativo
-                      </div>
-                    ) : (
-                      <div className="inline-block rounded-md bg-amber-100 px-2 py-1 text-sm font-medium text-amber-900">
-                        Inativo
-                      </div>
-                    )}
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {/* Edit (abre dialog local) */}
-                      <button
-                        type="button"
-                        aria-label={`Editar ${u.name}`}
-                        onClick={() => openEditDialog(u)}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-slate-100"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-
-                      {/* Delete dialog (usa onDelete prop) */}
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <Trash className="h-5 w-5 cursor-pointer" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Esta ação não pode ser desfeita. Isso excluirá
-                              este usuário.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteClick(u)}
-                              disabled={deletingId === u.userId}
-                            >
-                              {deletingId === u.userId
-                                ? "Excluindo..."
-                                : "Continuar"}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                  ) : (
+                    <div className="inline-block rounded-md bg-amber-100 px-2 py-1 text-sm font-medium text-amber-900">
+                      Inativo
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))
+                  )}
+                </TableCell>
+
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {/* Edit (abre dialog local) */}
+                    <button
+                      type="button"
+                      aria-label={`Editar ${u.name}`}
+                      onClick={() => openEditDialog(u)}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-slate-100"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+
+                    {/* Delete dialog (usa onDelete prop) */}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <Trash className="h-5 w-5 cursor-pointer" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Esta ação não pode ser desfeita. Isso excluirá
+                            este usuário.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteClick(u)}
+                            disabled={deletingId === u.userId}
+                          >
+                            {deletingId === u.userId
+                              ? "Excluindo..."
+                              : "Continuar"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
             )}
           </TableBody>
         </Table>
