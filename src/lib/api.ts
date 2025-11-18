@@ -1,84 +1,125 @@
-import { authApi } from "@/lib/authApi";
 import { useAuthStore } from "@/stores/auth-store";
-import axios from "axios";
-import { toast } from "sonner";
+import axios, { type AxiosRequestConfig } from "axios";
 
-const api = axios.create({
+/* ============================================================
+   Instâncias base
+============================================================ */
+
+export const authApi = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
 });
 
-export const setAuthToken = (token?: string) => {
-  if (token) {
-    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  } else {
-    delete api.defaults.headers.common["Authorization"];
-  }
+export const noAuthApi = axios.create({
+  baseURL: import.meta.env.VITE_BASE_URL,
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true,
+});
+
+/* ============================================================
+   Controle interno
+============================================================ */
+
+let isRefreshing = false;
+
+let failedQueue: Array<{
+  resolve: (value: any) => void;
+  reject: (error: any) => void;
+  originalRequest: AxiosRequestConfig;
+}> = [];
+
+/* ============================================================
+   Processamento da fila
+============================================================ */
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject, originalRequest }) => {
+    if (token) {
+      const retryConfig: AxiosRequestConfig = {
+        ...originalRequest,
+        headers: {
+          ...(originalRequest.headers || {}),
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      resolve(authApi(retryConfig));
+    } else {
+      reject(error);
+    }
+  });
+
+  failedQueue = [];
 };
 
-// attach token to each request if available
-api.interceptors.request.use((config) => {
-  const sessionActive = sessionStorage.getItem("sessionActive");
-  if (!sessionActive) {
-    console.log("Sem sessão ativa");
-    return config;
+/* ============================================================
+   Interceptor de request
+============================================================ */
+
+authApi.interceptors.request.use((config) => {
+  const { accessToken } = useAuthStore.getState();
+
+  if (accessToken) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${accessToken}`;
   }
 
-  if (!config.headers?.Authorization) {
-    const { accessToken } = useAuthStore.getState();
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-  }
-  console.log("Request headers:", config.headers?.Authorization ?? null);
   return config;
 });
 
-// get response and handle errors globally
-api.interceptors.response.use(
-  (res) => res,
+/* ============================================================
+   Interceptor de resposta
+============================================================ */
+
+authApi.interceptors.response.use(
+  (response) => response,
+
   async (error) => {
     const originalRequest = error.config;
-    const status = error.response?.status;
-    const message =
-      error.response?.data?.message ||
-      error.message ||
-      "Um erro inesperado ocorreu";
 
-    if (status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      if (originalRequest.url === "/auth/login" && originalRequest.method === "post") {
-        console.log("rejeitando erro de login");
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // Permitir falhar login normal
+      if (
+        originalRequest.url === "/auth/login" &&
+        originalRequest.method === "post"
+      ) {
         return Promise.reject(error);
       }
 
-      try {
-        console.log("axios: tentando refresh token");
-        const { data } = await authApi.get("/auth/refresh-token", {
-          withCredentials: true,
-        });
+      originalRequest._retry = true;
 
-        const newToken = data.token;
-        setAuthToken(newToken);
-        useAuthStore.getState().setAccessToken(newToken);
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject, originalRequest });
 
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        return api(originalRequest);
-      } catch (err) {
-        console.log("axios: refresh token falhou, limpando autenticação local");
-        useAuthStore.getState().logout();
-        return Promise.reject(err);
-      }
-    } else if (status === 500) {
-      toast.error("Erro interno do servidor: " + message);
-    } else {
-      console.log("Erro: " + message);
+        if (!isRefreshing) {
+          isRefreshing = true;
+
+          (async () => {
+            try {
+              const response = await noAuthApi.get("/auth/refresh-token");
+
+              const { setAccessToken, setAuthReady } =
+                useAuthStore.getState();
+              setAuthReady(false);
+
+              const newToken = response.data.token;
+              setAccessToken(newToken);
+
+              processQueue(null, newToken);
+            } catch (refreshError) {
+              processQueue(refreshError, null);
+
+              const { logout } = useAuthStore.getState();
+              await logout();
+            } finally {
+              isRefreshing = false;
+            }
+          })();
+        }
+      });
     }
 
     return Promise.reject(error);
   }
 );
-
-export default api;

@@ -7,15 +7,20 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, accessToken, isAuthReady } = useAuthStore();
+  const { accessToken, isAuthReady } = useAuthStore();
+  const hasSession = sessionStorage.getItem("sessionActive");
 
-  return (
-    !isAuthReady ? (
-      <FullPageSpinner />
-    ) 
-    : (!user || !accessToken) ? (
-      <Navigate to="/" replace />
-    ) 
-    : <>{children}</>
-  );
+  // Enquanto a auth não estiver pronta, não tomamos decisões
+  if (!isAuthReady) {
+    return <FullPageSpinner />;
+  }
+
+  // Quando a auth já está pronta:
+  // Se não há token E não há sessão → redirecionar
+  if (!accessToken && !hasSession) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Caso contrário, o utilizador pode entrar
+  return <>{children}</>;
 }
