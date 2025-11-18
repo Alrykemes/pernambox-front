@@ -51,20 +51,6 @@ export default function UserProfile() {
     },
   });
 
-  useEffect(() => {
-    console.log(user?.cpf);
-    formEditMe.reset({
-      userId: user?.userId ?? '',
-      name: user?.name ?? '',
-      email: user?.email ?? '',
-      cpf: user?.cpf ?? '',
-      phone: user?.phone ?? '',
-      password: "",
-      imageProfile: ""
-    }
-    )
-  }, [user]);
-
   const updateUser = useMutation({
     mutationFn: async (payload: {
       userId: string;
