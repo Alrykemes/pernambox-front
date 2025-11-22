@@ -1,4 +1,5 @@
 import Home from "@/pages/dashboard/Home";
+import { LogHistory } from "@/pages/dashboard/LogHistory";
 import Unit from "@/pages/dashboard/Units";
 import Users from "@/pages/dashboard/Users";
 import { Navigate } from "react-router-dom";
@@ -22,5 +23,10 @@ export const dashboardRoutes = [
     path: "usuarios",
     element: <Users />,
     handle: { breadcrumb: "Usuários" },
+  },
+  {
+    path: "historico",
+    element: <LogHistory />,
+    handle: { breadcrumb: "Histórico de Alterações" },
   }
 ];

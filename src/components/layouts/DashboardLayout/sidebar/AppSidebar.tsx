@@ -17,12 +17,11 @@ type Props = React.ComponentProps<typeof Sidebar>;
 
 export function AppSidebar(props: Props) {
   const { user } = useAuthStore();
-  if (!user) return null;
-
-  const { main, settings } = useMemo(
-    () => getNavItemsForRole(user.role),
-    [user.role],
-  );
+  
+  const { main, settings } = useMemo(() => {
+    if (!user) return { main: [], settings: [] };
+    return getNavItemsForRole(user.role);
+  }, [user]);
 
   const sidebarMainLabel = "MENU PRINCIPAL";
   const sidebarSettingsLabel = "CONFIGURAÇÕES";
@@ -39,7 +38,7 @@ export function AppSidebar(props: Props) {
       </SidebarContent>
 
       <SidebarFooter>
-        <UserMenu user={user} />
+        {user && <UserMenu user={user} />}
       </SidebarFooter>
 
       <SidebarRail />

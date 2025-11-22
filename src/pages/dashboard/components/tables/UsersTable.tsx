@@ -39,6 +39,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { useProfilePhoto } from "@/hooks/use-profile-photo";
 import { AvatarFallback, Avatar, AvatarImage } from "@/components/ui/avatar";
+import { getInitials } from "@/utils/getInitials";
 
 const UserUpdateSchema = z.object({
   userId: z.string().nonempty(),
@@ -63,16 +64,6 @@ interface UsersTableProps {
     active: boolean;
   }) => Promise<any> | void;
   onDelete?: (user: User) => Promise<any> | void;
-}
-
-function getInitials(name?: string) {
-  if (!name) return "?";
-  const parts = name.trim().split(/\s+/);
-  const initials =
-    parts.length === 1
-      ? parts[0].slice(0, 2)
-      : (parts[0][0] ?? "") + (parts[parts.length - 1][0] ?? "");
-  return initials.toUpperCase();
 }
 
 export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {

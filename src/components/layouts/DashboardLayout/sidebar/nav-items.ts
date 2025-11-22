@@ -1,5 +1,6 @@
 import {
   Handbag,
+  History,
   Home,
   MapPinHouse,
   Settings,
@@ -28,6 +29,7 @@ export const roleToNavItems: Record<Role, NavSection> = {
       { title: "Estoque", url: "/dashboard/estoque", icon: Warehouse },
       { title: "Produtos", url: "/dashboard/produtos", icon: Handbag },
       { title: "Usuários", url: "/dashboard/usuarios", icon: Users },
+      { title: "Alterações", url: "/dashboard/historico", icon: History },
     ],
     settings: [
       { title: "Sistema", url: "/configuracoes/sistema", icon: Settings },
@@ -41,6 +43,7 @@ export const roleToNavItems: Record<Role, NavSection> = {
       { title: "Estoque", url: "/dashboard/estoque", icon: Warehouse },
       { title: "Produtos", url: "/dashboard/produtos", icon: Handbag },
       { title: "Usuários", url: "/dashboard/usuarios", icon: Users },
+      { title: "Alterações", url: "/dashboard/historico", icon: History },
     ],
     settings: [
       { title: "Sistema", url: "/configuracoes/sistema", icon: Settings },

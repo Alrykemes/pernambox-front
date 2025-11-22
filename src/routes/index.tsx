@@ -20,7 +20,11 @@ export const routes: RouteObject[] = [
   },
   {
     path: "/recuperar-senha",
-    element: <CenteredLayout />,
+    element: (
+      <PublicRoute>
+        <CenteredLayout />
+      </PublicRoute>
+    ),
     children: [...passwordResetRoutes],
   },
   {
