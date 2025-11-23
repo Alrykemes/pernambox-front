@@ -51,6 +51,13 @@ export default function UserProfile() {
     },
   });
 
+  useEffect(() => {
+    
+    formEditMe.setValue("cpf", user?.cpf ?? '');
+    formEditMe.setValue("phone", user?.phone ?? '');
+    
+  }, [user]);
+
   const updateUser = useMutation({
     mutationFn: async (payload: {
       userId: string;

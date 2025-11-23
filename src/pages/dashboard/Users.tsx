@@ -25,6 +25,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { DashboardCard } from "./components/DashboardCard";
 import { UsersTable } from "./components/tables/UsersTable";
+import { useAuthStore } from "@/stores/auth-store";
 
 interface UserStats {
   total: number;
@@ -46,6 +47,7 @@ export default function Users() {
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [size] = useState(10);
+  const { user } = useAuthStore.getState();
 
   const { data: userStats, isLoading: statsLoading } = useQuery<UserStats>({
     queryKey: ["userStats"],
@@ -253,10 +255,17 @@ export default function Users() {
                     control={form.control}
                     name="role"
                     label="Permissão"
-                    options={[
-                      { value: "ADMIN", label: "Administrador" },
-                      { value: "USER", label: "Funcionário" },
-                    ]}
+                    options={
+                      user?.role === "ADMIN_MASTER" ?
+                      [
+                        { value: "ADMIN_MASTER", label: "Administrador Geral" },
+                        { value: "ADMIN", label: "Administrador" },
+                        { value: "USER", label: "Funcionário" },
+                      ] : [
+                        { value: "ADMIN", label: "Administrador" },
+                        { value: "USER", label: "Funcionário" },
+                      ]
+                    }
                   />
 
                   <Button
