@@ -1,0 +1,247 @@
+import { HookFormProvider } from "@/components/form/HookFormProvider";
+import { InputField } from "@/components/form/InputField";
+import { ResponsibleSelect } from "@/components/form/ResponsibleSelect";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { authApi } from "@/lib/api";
+import { queryClient } from "@/lib/react-query";
+import { DashboardCard } from "@/pages/dashboard/components/DashboardCard";
+import { UnitCard } from "@/pages/dashboard/components/UnitCard/UnitCard";
+import {
+  UnitCreateSchema,
+  type UnitCreateType,
+} from "@/schemas/dashboard/unit-create";
+import { useAuthStore } from "@/stores/auth-store";
+import type { Unit } from "@/types/common";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
+import { MapPinCheck, MapPinHouse, MapPinX, Plus } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+interface UnitStats {
+  totalUnits: number,
+  unitsActives: number,
+  unitsDeactivates: number,
+  lastUnitCreated: Unit
+}
+
+export default function UnitPage() {
+  const { user } = useAuthStore();
+  const [open, setOpen] = useState(false);
+
+  const { data: units } = useQuery<Unit[]>({
+    queryKey: ["units"],
+    queryFn: async () => {
+      const { data } = await authApi.get("/unit");
+      return data;
+    },
+  });
+
+  const { data: unitsStats, isLoading: statsLoading } = useQuery<UnitStats>({
+    queryKey: ["unitsStats"],
+    queryFn: async () => {
+      const response = await authApi.get("/unit/info/stats");
+      return response.data as UnitStats;
+    },
+    staleTime: 1000 * 30,
+  });
+
+  const unitsArray = units ?? [];
+
+  const form = useForm<UnitCreateType>({
+    resolver: zodResolver(UnitCreateSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
+    defaultValues: {
+      name: "",
+      phone: "",
+      email: "",
+      responsible_id: "",
+      address: {
+        number: "",
+        street: "",
+        district: "",
+        city: "",
+        state: "",
+        zipCode: "",
+        complement: "",
+      },
+    },
+  });
+
+  const onSubmit = async (data: UnitCreateType) => {
+    try {
+      const response = await authApi.post("/unit/create", data);
+      if (response.status === 201 || response.data.success) {
+        toast.success("Unidade criada com sucesso!");
+        setOpen(false);
+        queryClient.invalidateQueries({ queryKey: ["units"] });
+        queryClient.invalidateQueries({ queryKey: ["unitsStats"] });
+        form.reset();
+      } else {
+        toast.error("Erro ao criar unidade. Tente novamente.");
+      }
+    } catch (error) {
+      toast.error("Erro ao criar unidade. Tente novamente.");
+      console.error(error);
+    }
+  };
+
+  return user ? (
+    <div className="p-4">
+      <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <DashboardCard
+          title="Total de Unidades"
+          content={unitsStats ? String(unitsStats.totalUnits) : "Carregando..."}
+          icon={<MapPinHouse className="h-4 w-4 text-blue-500" />}
+        />
+        <DashboardCard
+          title="Total Ativas"
+          content={unitsStats ? String(unitsStats.unitsActives) : "Carregando..."}
+          icon={<MapPinCheck className="h-4 w-4 text-green-500" />}
+        />
+        <DashboardCard
+          title="Total Desativadas"
+          content={unitsStats ? String(unitsStats.unitsDeactivates) : "Carregando..."}
+          icon={<MapPinX className="h-4 w-4 text-red-500" />}
+        />
+        <DashboardCard
+          title="Última Adicionada"
+          content={unitsStats ? String(unitsStats.lastUnitCreated.name) : "Carregando..."}
+          icon={<Plus className="h-4 w-4 text-green-500" />}
+        />
+      </div>
+      <div className="flex items-center justify-between pt-6 pb-2">
+        <div>
+          <h3 className="text-bold">Lista de Unidades</h3>
+          <h4 className="text-muted-foreground text-sm">
+            {user?.role === "ADMIN_MASTER" && "Crie e Gerencie suas unidades"}
+            {(user?.role === "USER" || user?.role === "ADMIN") && "Verifique e vizualize as unidades"}
+          </h4>
+        </div>
+        <div className="flex items-center gap-4 pt-6 pb-2">
+
+          {user?.role === "ADMIN_MASTER" && (
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-950 hover:bg-blue-900 text-white">
+                  <Plus />
+                  Adicionar Unidade
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Adicionar Nova Unidade</DialogTitle>
+                  <DialogDescription>
+                    Formulário para adicionar uma nova unidade.
+                  </DialogDescription>
+                </DialogHeader>
+                <HookFormProvider form={form} onSubmit={onSubmit}>
+                  <div className="space-y-4">
+                    <InputField
+                      control={form.control}
+                      name="name"
+                      label="Nome"
+                      placeholder="Unidade Olinda"
+                    />
+                    <InputField
+                      control={form.control}
+                      name="phone"
+                      label="Telefone"
+                      placeholder="(81) 99999-9999"
+                    />
+                    <InputField
+                      control={form.control}
+                      name="email"
+                      label="E-mail"
+                      placeholder="john@example.com"
+                    />
+                    <ResponsibleSelect
+                      control={form.control}
+                      name="responsible_id"
+                      label="Responsável"
+                      placeholder="Selecione um responsável"
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <InputField
+                        control={form.control}
+                        name="address.number"
+                        label="Número"
+                        placeholder="123"
+                      />
+                      <InputField
+                        control={form.control}
+                        name="address.zipCode"
+                        label="CEP"
+                        placeholder="50000-000"
+                      />
+                    </div>
+
+                    <InputField
+                      control={form.control}
+                      name="address.street"
+                      label="Rua"
+                      placeholder="Av. Brasil"
+                    />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <InputField
+                        control={form.control}
+                        name="address.district"
+                        label="Bairro"
+                        placeholder="Centro"
+                      />
+                      <InputField
+                        control={form.control}
+                        name="address.city"
+                        label="Cidade"
+                        placeholder="Recife"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <InputField
+                        control={form.control}
+                        name="address.state"
+                        label="Estado"
+                        placeholder="Pernambuco"
+                      />
+                      <InputField
+                        control={form.control}
+                        name="address.complement"
+                        label="Complemento"
+                        placeholder="Apto 101"
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      className="w-full bg-blue-950 hover:bg-blue-900"
+                      disabled={!form.formState.isValid}
+                    >
+                      Criar Unidade
+                    </Button>
+                  </div>
+                </HookFormProvider>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
+      </div>
+      <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+        {unitsArray.map((unit: Unit) => (
+          <UnitCard key={unit.id} unit={unit} user={user} />
+        ))}
+      </div>
+    </div>
+  ) : <></>;
+}

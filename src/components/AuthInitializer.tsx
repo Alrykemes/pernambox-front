@@ -1,24 +1,70 @@
-import api from "@/lib/api";
+import { noAuthApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth-store";
-import { useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 
-export function AuthInitializer({ children }: { children: React.ReactNode }) {
-  const { accessToken, setAccessToken, fetchUser, logout } = useAuthStore();
+export function AuthInitializer({ children }: { children: ReactNode }) {
+  const {
+    accessToken,
+    setAccessToken,
+    setUser,
+    setAuthReady,
+    user,
+    fetchUser,
+  } = useAuthStore();
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        const { data } = await api.get("/auth/refresh-token", {
-          withCredentials: true,
+    const initialize = async () => {
+      // ✅ Aguarda a reidratação manualmente
+      const waitForHydration = async () => {
+        if (useAuthStore.persist.hasHydrated()) return;
+        await new Promise<void>((resolve) => {
+          const unsub = useAuthStore.persist.onFinishHydration(() => {
+            unsub();
+            resolve();
+          });
         });
-        setAccessToken(data.accessToken);
-        await fetchUser();
-      } catch {
-        logout();
-      }
-    };
-    if (!accessToken) init();
-  }, []);
+      };
 
-  return <>{children}</>;
+      await waitForHydration();
+
+      const hasSession = sessionStorage.getItem("sessionActive");
+
+      // 🔹 Caso 1: já há token
+      if (accessToken) {
+        try {
+          if (!user) {
+            const fetchedUser = await fetchUser();
+            if (fetchedUser) setUser(fetchedUser);
+          }
+        } catch {
+          // ignore refresh errors
+        } finally {
+          setAuthReady(true);
+        }
+        return;
+      }
+
+      // 🔹 Caso 2: há sessão mas sem token
+      if (hasSession && !accessToken) {
+        try {
+          const { data } = await noAuthApi.get("/auth/refresh-token");
+          setAccessToken(data.token);
+          const fetchedUser = await fetchUser();
+          if (fetchedUser) setUser(fetchedUser);
+        } catch {
+          // ignore refresh errors
+        } finally {
+          setAuthReady(true);
+        }
+        return;
+      }
+
+      // 🔹 Caso 3: sem sessão nem token
+      setAuthReady(true);
+    };
+
+    initialize();
+  }, [accessToken, setAuthReady]);
+
+  return children;
 }

@@ -1,44 +1,99 @@
-import api from "@/lib/api";
-import type { LoginType } from "@/schemas/auth/login";
-import type { User } from "@/types/user";
+import { authApi } from "@/lib/api";
+import type { LoginType } from "@/pages/auth/Login";
+import type { AuthMeResponse, LoginResponse } from "@/types/api/auth";
+import type { User } from "@/types/common";
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 type AuthState = {
   user: User | null;
-  fetchUser: () => Promise<void>;
-  login: (data: LoginType) => Promise<void>;
-  logout: () => void;
+  setUser: (user: User | null) => void;
+  fetchUser: () => Promise<User | null>;
+  login: (data: LoginType) => Promise<User | null>;
+  logout: () => Promise<void>;
   accessToken: string | null;
-  setAccessToken: (token: string) => void;
+  setAccessToken: (token: string | null) => void;
+  isAuthReady: boolean;
+  setAuthReady: (v: boolean) => void;
+
+  clearAuthData: () => void;
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  accessToken: null,
-  loading: false,
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      accessToken: null,
+      isAuthReady: false,
 
-  login: async (data: LoginType) => {
-    try {
-      const { data: response } = await api.post("/auth/login", data);
-      set({ user: response.user, accessToken: response.accessToken });
-    } catch (error) {
-      console.error("Login failed:", error);
-      throw error;
-    }
-  },
+      login: async (data: LoginType) => {
+        try {
+          const { data: response } = await authApi.post<LoginResponse>(
+            "/auth/login",
+            data,
+          );
+          const token = response.token;
+          if (!token) throw new Error("O token de acesso não foi fornecido.");
 
-  logout: () => {
-    set({ user: null, accessToken: null });
-  },
+          set({ accessToken: token });
+          sessionStorage.setItem("sessionActive", "true");
 
-  fetchUser: async () => {
-    try {
-      const { data } = await api.get("/auth/me");
-      set({ user: data });
-    } catch {
-      set({ user: null });
-    }
-  },
+          const user = await get().fetchUser();
+          return user;
+        } catch (error) {
+          get().clearAuthData();
+          throw error;
+        }
+      },
 
-  setAccessToken: (token) => set({ accessToken: token }),
-}));
+      logout: async () => {
+        try {
+          await authApi.post("/auth/logout");
+        } catch (err) {
+          throw err;
+        }
+        get().clearAuthData();
+      },
+
+      fetchUser: async () => {
+        const cachedUser = get().user;
+        if (cachedUser && cachedUser.cpf) return cachedUser;
+        try {
+          const { data } = await authApi.get<AuthMeResponse>("/auth/me");
+          const user = data;
+          if (!user) throw new Error("Usuário não encontrado.");
+          set({ user });
+          return user;
+        } catch (err) {
+          set({ user: null });
+          throw err;
+        }
+      },
+
+      clearAuthData: () => {
+        set({ user: null, accessToken: null });
+        sessionStorage.removeItem("auth-storage");
+        sessionStorage.removeItem("sessionActive");
+      },
+
+      setAccessToken: (token) => set({ accessToken: token }),
+      setUser: (user) => set({ user }),
+      setAuthReady: (ready) => set({ isAuthReady: ready }),
+    }),
+    {
+      name: "auth-storage",
+      storage: createJSONStorage(() => sessionStorage),
+      partialize: (state) => ({
+        user: state.user
+          ? {
+              userId: state.user.userId,
+              name: state.user.name,
+              email: state.user.email,
+              role: state.user.role,
+              imageProfileName: state.user.imageProfileName,
+            }
+          : null,
+      }),
+    },
+  ),
+);

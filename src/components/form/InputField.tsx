@@ -1,34 +1,27 @@
 import { ControlledField } from "@/components/form/ControlledField";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import type { ComponentProps } from "react";
 import type { Control, FieldValues, Path } from "react-hook-form";
 
-export interface InputFieldProps<T extends FieldValues> {
+export interface InputFieldProps<T extends FieldValues>
+  extends Omit<ComponentProps<typeof Input>, "name" | "value" | "onChange"> {
   control: Control<T>;
   name: Path<T>;
   label: string;
-  placeholder?: string;
-  type?: string;
-  className?: string;
 }
 
 export function InputField<T extends FieldValues>({
   control,
   name,
   label,
-  placeholder,
-  type = "text",
   className,
+  ...rest
 }: InputFieldProps<T>) {
   return (
     <ControlledField control={control} name={name} label={label}>
       {(field) => (
-        <Input
-          placeholder={placeholder}
-          type={type}
-          className={cn("h-12", className)}
-          {...field}
-        />
+        <Input {...field} {...rest} className={cn("h-12", className)} />
       )}
     </ControlledField>
   );

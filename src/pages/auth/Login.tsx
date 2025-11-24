@@ -1,19 +1,30 @@
 import AppButton from "@/components/AppButton";
-import { CheckboxField } from "@/components/form/CheckBoxField";
-import { HookFormProvider } from "@/components/form/HookFormProvider";
-import { InputField } from "@/components/form/InputField";
-import PasswordField from "@/components/form/PasswordField";
-import Logo from "@/components/Logo";
-import { LoginSchema, type LoginType } from "@/schemas/auth/login";
+import {
+  CheckboxField,
+  HookFormProvider,
+  InputField,
+  InputPasswordField,
+} from "@/components/form";
+import { FormButton } from "@/components/form/FormButton";
+import SystemLogo from "@/pages/auth/components/SystemLogo";
 import { useAuthStore } from "@/stores/auth-store";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { KeyRound } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { z } from "zod";
+
+const LoginSchema = z.object({
+  email: z.email("Insira um endereço de email válido."),
+  password: z.string().min(8, "A senha precisa ter no mínimo 8 caracteres."),
+  rememberMe: z.boolean().optional(),
+});
+export type LoginType = z.infer<typeof LoginSchema>;
 
 export default function Login() {
-  const { login } = useAuthStore();
   const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
 
   const form = useForm<LoginType>({
     resolver: zodResolver(LoginSchema),
@@ -21,7 +32,6 @@ export default function Login() {
     reValidateMode: "onChange",
     defaultValues: { email: "", password: "", rememberMe: false },
   });
-
   const onSubmit = async (data: LoginType) => {
     try {
       await login({
@@ -30,59 +40,71 @@ export default function Login() {
         rememberMe: data.rememberMe ?? false,
       });
       toast.success("Login realizado com sucesso!");
-      navigate("/dashboard")
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       toast.error(
         "Erro ao fazer login. Verifique suas credenciais e tente novamente.",
       );
-      console.error(error);
     }
   };
 
   return (
-    <>
-      <Logo />
-      <HookFormProvider form={form} onSubmit={onSubmit}>
-        <div className="space-y-4">
-          <InputField
-            control={form.control}
-            name="email"
-            label="E-mail"
-            placeholder="john.doe@example.com"
-            type="email"
-          />
+    <div>
+      <SystemLogo />
+      <section>
+        <HookFormProvider form={form} onSubmit={onSubmit}>
+          <div className="space-y-4">
+            <InputField
+              control={form.control}
+              name="email"
+              label="E-mail"
+              placeholder="john.doe@example.com"
+              type="email"
+              autoFocus
+              autoComplete="email"
+            />
 
-          <PasswordField
-            control={form.control}
-            name="password"
-            label="Senha"
-            placeholder="••••••••"
-            type="password"
-          />
-        </div>
-        <div className="mt-4 flex items-center justify-between">
-          <CheckboxField
-            control={form.control}
-            name="rememberMe"
-            label="Lembrar-me"
-          />
-          <Link
-            to="/recuperar-senha"
-            className="translate-y-0.5 text-sm text-orange-500 hover:underline"
+            <InputPasswordField
+              control={form.control}
+              name="password"
+              label="Senha"
+              placeholder="••••••••"
+              type="password"
+              autoComplete="current-password"
+            />
+          </div>
+          <div className="mt-4 flex items-center justify-between">
+            <CheckboxField
+              control={form.control}
+              name="rememberMe"
+              label="Lembrar-me"
+            />
+            <Link
+              to="/recuperar-senha"
+              className="translate-y-0.5 text-sm text-orange-500 hover:underline"
+            >
+              Esqueceu sua senha?
+            </Link>
+          </div>
+          <FormButton
+            type="submit"
+            disabled={!form.formState.isValid || !form.formState.isDirty}
+            className="mt-6 h-12 w-full bg-orange-500 font-bold text-white hover:bg-orange-600"
+            aria-label="Entrar no sistema"
           >
-            Esqueceu sua senha?
-          </Link>
-        </div>
-        <AppButton
-          type="submit"
-          isLoading={form.formState.isSubmitting}
-          disabled={!form.formState.isValid}
-          className="mt-6 h-12 w-full bg-orange-500 font-bold text-white hover:bg-orange-600"
-          aria-label="botão de entrar no sistema"
-        >
-          Entrar
-        </AppButton>
-      </HookFormProvider>
-    </>
+            Entrar
+          </FormButton>
+          <AppButton
+            type="button"
+            disabled={true}
+            className="mt-6 h-12 w-full bg-orange-500 font-bold text-white hover:bg-orange-600"
+            aria-label="botão de entrar no sistema"
+          >
+            <KeyRound />
+            Entrar com SSO
+          </AppButton>
+        </HookFormProvider>
+      </section>
+    </div>
   );
 }

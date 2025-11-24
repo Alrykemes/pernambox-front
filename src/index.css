@@ -121,3 +121,117 @@
     font-family: "Inter", sans-serif;
   }
 }
+
+.high-contrast {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0 0 0);
+  --border: oklch(0 0 0);
+  --input: oklch(0 0 0);
+  --ring: oklch(0.5 0.2 250);
+}
+
+.dark.high-contrast {
+  --background: oklch(0 0 0);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.1 0 0);
+  --card-foreground: oklch(1 0 0);
+  --border: oklch(1 0 0);
+  --input: oklch(1 0 0);
+}
+
+.high-contrast * {
+  border-color: var(--border) !important;
+}
+
+.enlarged-font {
+  font-size: 1rem;
+}
+
+.enlarged-font *:not([data-slot="switch"]):not([data-slot="switch-thumb"]) {
+  font-size: 1em;
+}
+
+.enlarged-font h1 {
+  font-size: 2em;
+}
+
+.enlarged-font h2 {
+  font-size: 1.75em;
+}
+
+.enlarged-font h3 {
+  font-size: 1.5em;
+}
+
+.enlarged-font h4 {
+  font-size: 1.25em;
+}
+
+.enlarged-font button:not([data-slot="switch"]),
+.enlarged-font input:not([data-slot="switch"]),
+.enlarged-font select,
+.enlarged-font textarea {
+  font-size: 1.15em;
+  padding: 0.75em 1em;
+}
+
+.enlarged-font [data-slot="switch"] {
+  font-size: unset !important;
+  padding: unset !important;
+  width: 2rem !important;
+  height: 1.15rem !important;
+}
+
+.enlarged-font [data-slot="switch-thumb"] {
+  font-size: unset !important;
+  padding: unset !important;
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+.enlarged-cursor {
+  cursor: url("/public/cursor.png") 12 12, auto !important;
+}
+
+.enlarged-cursor * {
+  cursor: inherit !important;
+}
+
+.enlarged-cursor button,
+.enlarged-cursor a,
+.enlarged-cursor [role="button"],
+.enlarged-cursor input[type="button"],
+.enlarged-cursor input[type="submit"],
+.enlarged-cursor [tabindex]:not([tabindex='-1']) {
+  cursor: url("/public/pointer.png") 12 12, pointer !important;
+}
+
+.enlarged-focus button,
+.enlarged-focus a,
+.enlarged-focus input,
+.enlarged-focus select,
+.enlarged-focus textarea,
+.enlarged-focus [role="button"],
+.enlarged-focus [role="link"],
+.enlarged-focus [tabindex]:not([tabindex='-1']),
+.enlarged-focus [data-slot="button"],
+.enlarged-focus [data-slot="input"],
+.enlarged-focus [data-slot="select-trigger"] {
+  outline: 2px solid oklch(0.5 0.2 250 / 0.5) !important;
+  outline-offset: 1px !important;
+}
+
+.enlarged-focus *:focus,
+.enlarged-focus *:focus-visible {
+  outline: 4px solid oklch(0.5 0.2 250) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 2px oklch(1 0 0), 0 0 0 6px oklch(0.5 0.2 250) !important;
+  border-color: oklch(0.5 0.2 250) !important;
+  --tw-ring-offset-shadow: 0 0 0 2px oklch(1 0 0) !important;
+  --tw-ring-shadow: 0 0 0 6px oklch(0.5 0.2 250) !important;
+  --tw-ring-offset-width: 2px !important;
+  --tw-ring-width: 6px !important;
+  --tw-ring-color: oklch(0.5 0.2 250) !important;
+}

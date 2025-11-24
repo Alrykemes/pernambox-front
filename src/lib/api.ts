@@ -1,52 +1,125 @@
 import { useAuthStore } from "@/stores/auth-store";
-import axios from "axios";
-import { toast } from "sonner";
+import axios, { type AxiosRequestConfig } from "axios";
 
-const api = axios.create({
+/* ============================================================
+   Instâncias base
+============================================================ */
+
+export const authApi = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
 });
 
-api.interceptors.request.use((config) => {
+export const noAuthApi = axios.create({
+  baseURL: import.meta.env.VITE_BASE_URL,
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true,
+});
+
+/* ============================================================
+   Controle interno
+============================================================ */
+
+let isRefreshing = false;
+
+let failedQueue: Array<{
+  resolve: (value: any) => void;
+  reject: (error: any) => void;
+  originalRequest: AxiosRequestConfig;
+}> = [];
+
+/* ============================================================
+   Processamento da fila
+============================================================ */
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject, originalRequest }) => {
+    if (token) {
+      const retryConfig: AxiosRequestConfig = {
+        ...originalRequest,
+        headers: {
+          ...(originalRequest.headers || {}),
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      resolve(authApi(retryConfig));
+    } else {
+      reject(error);
+    }
+  });
+
+  failedQueue = [];
+};
+
+/* ============================================================
+   Interceptor de request
+============================================================ */
+
+authApi.interceptors.request.use((config) => {
   const { accessToken } = useAuthStore.getState();
+
   if (accessToken) {
+    config.headers = config.headers || {};
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
+
   return config;
 });
 
-api.interceptors.response.use(
-  (res) => res,
+/* ============================================================
+   Interceptor de resposta
+============================================================ */
+
+authApi.interceptors.response.use(
+  (response) => response,
+
   async (error) => {
     const originalRequest = error.config;
-    const status = error.response?.status;
-    const message =
-      error.response?.data?.message ||
-      error.message ||
-      "Um erro inesperado ocorreu";
 
-    if (status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        const { data } = await api.get("/auth/refresh-token", {
-          withCredentials: true,
-        });
-        const { accessToken } = data;
-        useAuthStore.getState().setAccessToken(accessToken);
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        return api(originalRequest);
-      } catch (err) {
-        useAuthStore.getState().logout();
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // Permitir falhar login normal
+      if (
+        originalRequest.url === "/auth/login" &&
+        originalRequest.method === "post"
+      ) {
+        return Promise.reject(error);
       }
-    } else if (status === 500) {
-      toast.error("Erro interno do servidor: " + message);
-    } else {
-      console.log("Erro: " + message);
+
+      originalRequest._retry = true;
+
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject, originalRequest });
+
+        if (!isRefreshing) {
+          isRefreshing = true;
+
+          (async () => {
+            try {
+              const response = await noAuthApi.get("/auth/refresh-token");
+
+              const { setAccessToken, setAuthReady } =
+                useAuthStore.getState();
+              setAuthReady(false);
+
+              const newToken = response.data.token;
+              setAccessToken(newToken);
+
+              processQueue(null, newToken);
+            } catch (refreshError) {
+              processQueue(refreshError, null);
+
+              const { logout } = useAuthStore.getState();
+              await logout();
+            } finally {
+              isRefreshing = false;
+            }
+          })();
+        }
+      });
     }
 
     return Promise.reject(error);
-  },
+  }
 );
-
-export default api;
