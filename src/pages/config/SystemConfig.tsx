@@ -12,17 +12,20 @@ import { Settings, Accessibility, Warehouse } from "lucide-react";
 import { useState } from "react";
 import { SettingItem } from "@/pages/config/components/SettingItem";
 import { useTheme } from "@/components/ThemeProvider";
+import { useAccessibility } from "@/components/AccessibilityProvider";
 
 export default function SystemConfig() {
   const { theme, setTheme } = useTheme();
+  const {
+    settings,
+    setHighContrast,
+    setEnlargedFont,
+    setEnlargedCursor,
+    setEnlargedFocus,
+  } = useAccessibility();
   const [language, setLanguage] = useState("pt-BR");
   const [timezone, setTimezone] = useState("GMT-3");
   const [backup, setBackup] = useState(false);
-  const [blueLightFilter, setBlueLightFilter] = useState(false);
-  const [highContrast, setHighContrast] = useState(false);
-  const [enlargedFont, setEnlargedFont] = useState(false);
-  const [enlargedCursor, setEnlargedCursor] = useState(false);
-  const [enlargedFocus, setEnlargedFocus] = useState(false);
   const [expirationAlert, setExpirationAlert] = useState(false);
   const [receiveEmail, setReceiveEmail] = useState(false);
   const [notifyChanges, setNotifyChanges] = useState(false);
@@ -102,27 +105,23 @@ export default function SystemConfig() {
           </CardHeader>
           <CardContent className="space-y-0">
             <SettingItem
-              title="Filtro de Luz Azul"
-              description="Reduz a emissão de luz azul da tela"
-            >
-              <Switch
-                checked={blueLightFilter}
-                onCheckedChange={setBlueLightFilter}
-              />
-            </SettingItem>
-            <Separator />
-            <SettingItem
               title="Alto Contraste"
               description="Aumenta o contraste entre texto e fundo"
             >
-              <Switch checked={highContrast} onCheckedChange={setHighContrast} />
+              <Switch
+                checked={settings.highContrast}
+                onCheckedChange={setHighContrast}
+              />
             </SettingItem>
             <Separator />
             <SettingItem
               title="Fonte Ampliada"
               description="Aumenta o tamanho de todos os textos"
             >
-              <Switch checked={enlargedFont} onCheckedChange={setEnlargedFont} />
+              <Switch
+                checked={settings.enlargedFont}
+                onCheckedChange={setEnlargedFont}
+              />
             </SettingItem>
             <Separator />
             <SettingItem
@@ -130,7 +129,7 @@ export default function SystemConfig() {
               description="Aumenta o tamanho do cursor do mouse"
             >
               <Switch
-                checked={enlargedCursor}
+                checked={settings.enlargedCursor}
                 onCheckedChange={setEnlargedCursor}
               />
             </SettingItem>
@@ -140,7 +139,7 @@ export default function SystemConfig() {
               description="Destaca elementos focados na navegação"
             >
               <Switch
-                checked={enlargedFocus}
+                checked={settings.enlargedFocus}
                 onCheckedChange={setEnlargedFocus}
               />
             </SettingItem>
