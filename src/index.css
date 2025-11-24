@@ -149,7 +149,7 @@
   font-size: 1rem;
 }
 
-.enlarged-font * {
+.enlarged-font *:not([data-slot="switch"]):not([data-slot="switch-thumb"]) {
   font-size: 1em;
 }
 
@@ -169,12 +169,26 @@
   font-size: 1.25em;
 }
 
-.enlarged-font button,
-.enlarged-font input,
+.enlarged-font button:not([data-slot="switch"]),
+.enlarged-font input:not([data-slot="switch"]),
 .enlarged-font select,
 .enlarged-font textarea {
   font-size: 1.15em;
   padding: 0.75em 1em;
+}
+
+.enlarged-font [data-slot="switch"] {
+  font-size: unset !important;
+  padding: unset !important;
+  width: 2rem !important;
+  height: 1.15rem !important;
+}
+
+.enlarged-font [data-slot="switch-thumb"] {
+  font-size: unset !important;
+  padding: unset !important;
+  width: 1rem !important;
+  height: 1rem !important;
 }
 
 .enlarged-cursor {
@@ -221,4 +235,3 @@
   --tw-ring-width: 6px !important;
   --tw-ring-color: oklch(0.5 0.2 250) !important;
 }
-
