@@ -30,7 +30,7 @@ export const roleToNavItems: Record<Role, NavSection> = {
       { title: "Usuários", url: "/dashboard/usuarios", icon: Users },
     ],
     settings: [
-      { title: "Sistema", url: "/dashboard/configuracoes", icon: Settings },
+      { title: "Sistema", url: "/configuracoes/sistema", icon: Settings },
     ],
   },
   
@@ -43,7 +43,7 @@ export const roleToNavItems: Record<Role, NavSection> = {
       { title: "Usuários", url: "/dashboard/usuarios", icon: Users },
     ],
     settings: [
-      { title: "Sistema", url: "/dashboard/configuracoes", icon: Settings },
+      { title: "Sistema", url: "/configuracoes/sistema", icon: Settings },
     ],
   },
 
@@ -55,7 +55,7 @@ export const roleToNavItems: Record<Role, NavSection> = {
       { title: "Produtos", url: "/dashboard/produtos", icon: Handbag },
     ],
     settings: [
-      { title: "Sistema", url: "/dashboard/configuracoes", icon: Settings },
+      { title: "Sistema", url: "/configuracoes/sistema", icon: Settings },
     ],
   },
 };

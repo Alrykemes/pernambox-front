@@ -1,4 +1,5 @@
 import UserProfile from "@/pages/config/UserProfile";
+import SystemConfig from "@/pages/config/SystemConfig";
 import { Navigate } from "react-router-dom";
 
 export const configRoutes = [
@@ -10,5 +11,10 @@ export const configRoutes = [
     path: "perfil",
     element: <UserProfile />,
     handle: { breadcrumb: "Meu Perfil" },
-  }
+  },
+  {
+    path: "sistema",
+    element: <SystemConfig />,
+    handle: { breadcrumb: "Configurações do Sistema" },
+  },
 ];
