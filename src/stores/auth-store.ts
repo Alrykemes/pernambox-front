@@ -61,7 +61,6 @@ export const useAuthStore = create<AuthState>()(
         try {
           const { data } = await authApi.get<AuthMeResponse>("/auth/me");
           const user = data;
-          console.log(user);
           if (!user) throw new Error("Usuário não encontrado.");
           set({ user });
           return user;

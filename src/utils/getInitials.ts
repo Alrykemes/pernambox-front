@@ -1,9 +1,9 @@
-export const getInitials = (name: string | undefined) => {
-  if(name) {
-    const names = name.split(" ").slice(0, 2);
-    const initials = names.map((n) => n.charAt(0).toUpperCase()).join("");
-    return initials;
-  } else {
-    return "fp";
-  }
+export const getInitials = (name?: string | undefined) => {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/);
+  const initials =
+    parts.length === 1
+      ? parts[0].slice(0, 2)
+      : (parts[0][0] ?? "") + (parts[parts.length - 1][0] ?? "");
+  return initials.toUpperCase();
 };

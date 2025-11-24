@@ -25,7 +25,7 @@ export const UnitCreateSchema = z.object({
   email: z.email({
     error: "Insira um endereço de email válido.",
   }),
-  active: z.enum(["true", "false"]),
+  // active: z.enum(["true", "false"]),
   responsible_id: z.uuid({ error: "ID do responsável inválido" }),
   address: AddressSchema,
 });

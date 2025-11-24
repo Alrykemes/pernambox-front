@@ -1,4 +1,6 @@
 export type Role = "ADMIN_MASTER" | "ADMIN" | "USER";
+export type TypeLog = "CREATE" | "UPDATE" | "DELETE";
+export type Target = "UNIT" | "USER" | "PRODUCT" | "RESOURCE" | "RESOURCE_PRODUCT" | "ORIGIN" | "DESTINATION";
 
 export interface User {
   userId: string;
@@ -30,4 +32,15 @@ export interface Unit {
   active: boolean;
   responsible: User;
   address: Address;
+}
+
+export interface LogHistory {
+  id: number;
+  description: string;
+  logHistoryType: TypeLog;
+  logHistoryTarget: Target;
+  dateTime: string;
+  targetId: string;
+  unitId: string;
+  responsibleUser: User;
 }

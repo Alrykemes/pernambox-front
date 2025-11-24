@@ -19,14 +19,19 @@ import { LockKeyhole } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { CropperModal } from "./components/CropperModal";
 
 export default function UserProfile() {
-  const {user, setUser} = useAuthStore.getState();
+  const { user, setUser } = useAuthStore.getState();
   const [editing, setEditing] = useState(false);
   const [passwordEntered, setPasswordEntered] = useState(false);
   const { setUser: setUserAuth } = useAuthStore();
   const profilePhotoUrl = useProfilePhoto(user?.imageProfileName ?? null);
   const hasPhoto = Boolean(profilePhotoUrl);
+  const [tempImage, setTempImage] = useState<string | null>(null);
+  const [croppedFile, setCroppedFile] = useState<File | null>(null);
+  const [showCropper, setShowCropper] = useState(false);
+
 
   const formEditPassword = useForm({
     resolver: zodResolver(ChangePasswordSchema),
@@ -50,6 +55,13 @@ export default function UserProfile() {
       imageProfile: ""
     },
   });
+
+  useEffect(() => {
+
+    formEditMe.setValue("cpf", user?.cpf ?? '');
+    formEditMe.setValue("phone", user?.phone ?? '');
+
+  }, [user]);
 
   const updateUser = useMutation({
     mutationFn: async (payload: {
@@ -170,8 +182,21 @@ export default function UserProfile() {
                   <p className="font-medium text-gray-800">Foto do Perfil</p>
                 </div>
                 <Avatar className="w-40 h-40">
-                  {hasPhoto ? <AvatarImage className="rounded-full" src={profilePhotoUrl ?? ''} alt="Foto de perfil" />
-                    : <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>}
+                  {croppedFile ? (
+                    <AvatarImage
+                      className="rounded-full"
+                      src={URL.createObjectURL(croppedFile)}
+                      alt="Prévia"
+                    />
+                  ) : hasPhoto ? (
+                    <AvatarImage
+                      className="rounded-full"
+                      src={profilePhotoUrl ?? ""}
+                      alt="Foto de perfil"
+                    />
+                  ) : (
+                    <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
+                  )}
                 </Avatar>
               </div>
               <HookFormProvider form={formEditMe} onSubmit={editInfo} className="space-y-4 md:w-110 lg:w-180 xl:w-230">
@@ -182,20 +207,29 @@ export default function UserProfile() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Escolha sua Foto do Perfil</FormLabel>
-
                         <FormControl>
                           <Input
                             type="file"
                             accept="image/*"
                             disabled={!editing}
-                            onChange={(e) => field.onChange(e.target.files?.[0] ?? null)}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+
+                              const reader = new FileReader();
+                              reader.onload = () => {
+                                setTempImage(reader.result as string);
+                                setShowCropper(true);
+                              };
+                              reader.readAsDataURL(file);
+                            }}
                           />
                         </FormControl>
-
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
                 </div>
 
                 <div className="grid gap-2">
@@ -242,6 +276,22 @@ export default function UserProfile() {
                   </Button>
                 </div>
               </HookFormProvider>
+              {showCropper && tempImage && (
+                <CropperModal
+                  image={tempImage}
+                  onCancel={() => {
+                    setTempImage(null);
+                    setShowCropper(false);
+                  }}
+                  onComplete={(file) => {
+                    setCroppedFile(file);
+                    formEditMe.setValue("file", file);
+                    setTempImage(null);
+                    setShowCropper(false);
+                  }}
+                />
+              )}
+
             </TabsContent>
 
             <TabsContent value="profile-security">

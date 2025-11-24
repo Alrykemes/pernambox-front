@@ -1,14 +1,3 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -21,7 +10,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { User } from "@/types/common";
-import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 
 import { HookFormProvider } from "@/components/form/HookFormProvider";
@@ -37,8 +25,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { useProfilePhoto } from "@/hooks/use-profile-photo";
-import { AvatarFallback, Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useAuthStore } from "@/stores/auth-store";
+import { UserRow } from "./UserRow";
 
 const UserUpdateSchema = z.object({
   userId: z.string().nonempty(),
@@ -65,21 +53,12 @@ interface UsersTableProps {
   onDelete?: (user: User) => Promise<any> | void;
 }
 
-function getInitials(name?: string) {
-  if (!name) return "?";
-  const parts = name.trim().split(/\s+/);
-  const initials =
-    parts.length === 1
-      ? parts[0].slice(0, 2)
-      : (parts[0][0] ?? "") + (parts[parts.length - 1][0] ?? "");
-  return initials.toUpperCase();
-}
-
 export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [submittingEdit, setSubmittingEdit] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const { user } = useAuthStore.getState();
 
   const editForm = useForm<UserUpdateType>({
     resolver: zodResolver(UserUpdateSchema),
@@ -196,95 +175,15 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
                 </TableCell>
               </TableRow>
             ) : (users.map((u) => (
-              <TableRow key={u.userId}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                      <Avatar className="w-8 h-8">
-                        {Boolean(useProfilePhoto(u?.imageProfileName ?? null)) ? <AvatarImage className="rounded-full" src={useProfilePhoto(u?.imageProfileName ?? null) ?? ''} alt="Foto de perfil" />
-                          : <AvatarFallback>{getInitials(u?.name)}</AvatarFallback>}
-                      </Avatar>
-
-                    <div className="flex flex-col text-left">
-                      <span className="font-medium">{u.name}</span>
-                      <span className="text-muted-foreground text-xs">
-                        {u.cpf ?? ""}
-                      </span>
-                    </div>
-                  </div>
-                </TableCell>
-
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{u.email}</span>
-                    <span className="text-muted-foreground text-xs">
-                      {u.phone ?? ""}
-                    </span>
-                  </div>
-                </TableCell>
-
-                <TableCell>
-                  <div className="inline-block rounded-md px-2 py-1 text-sm font-medium">
-                    {u.role}
-                  </div>
-                </TableCell>
-
-                <TableCell>
-                  {u.active ? (
-                    <div className="inline-block rounded-md bg-green-100 px-2 py-1 text-sm font-medium text-green-900">
-                      Ativo
-                    </div>
-                  ) : (
-                    <div className="inline-block rounded-md bg-amber-100 px-2 py-1 text-sm font-medium text-amber-900">
-                      Inativo
-                    </div>
-                  )}
-                </TableCell>
-
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {/* Edit (abre dialog local) */}
-                    <button
-                      type="button"
-                      aria-label={`Editar ${u.name}`}
-                      onClick={() => openEditDialog(u)}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-slate-100"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </button>
-
-                    {/* Delete dialog (usa onDelete prop) */}
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <Trash className="h-5 w-5 cursor-pointer" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Esta ação não pode ser desfeita. Isso excluirá
-                            este usuário.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDeleteClick(u)}
-                            disabled={deletingId === u.userId}
-                          >
-                            {deletingId === u.userId
-                              ? "Excluindo..."
-                              : "Continuar"}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-            )}
+              <UserRow
+                key={u.userId}
+                u={u}
+                user={user}
+                openEditDialog={openEditDialog}
+                handleDeleteClick={handleDeleteClick}
+                deletingId={deletingId}
+              />
+            )))}
           </TableBody>
         </Table>
       </CardContent>
@@ -343,10 +242,16 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
                   control={editForm.control}
                   name="role"
                   label="Permissão"
-                  options={[
-                    { value: "ADMIN", label: "Administrador" },
-                    { value: "USER", label: "Funcionário" },
-                  ]}
+                  options={
+                    user?.role === "ADMIN_MASTER" ?
+                      [
+                        { value: "ADMIN_MASTER", label: "Administrador Geral" },
+                        { value: "ADMIN", label: "Administrador" },
+                        { value: "USER", label: "Funcionário" }
+                      ] : [
+                        { value: "ADMIN", label: "Administrador" },
+                        { value: "USER", label: "Funcionário" }
+                      ]}
                 />
 
                 <SelectField
@@ -371,10 +276,11 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
 
                 <Button
                   variant="ghost"
+                  type="button"
                   onClick={() => {
                     setEditOpen(false);
-                    editForm.reset();
                     setEditingUserId(null);
+                    editForm.reset();
                   }}
                 >
                   Cancelar

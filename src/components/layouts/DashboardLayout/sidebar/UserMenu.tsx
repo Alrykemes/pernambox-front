@@ -76,7 +76,7 @@ export function UserMenu({ user }: UserMenuProps) {
                 className="cursor-pointer"
                 onClick={
                   () => {
-                    navigate("/configurações/perfil");
+                    navigate("/configuracoes/perfil");
                   }
                 }>
                 <CircleUser />

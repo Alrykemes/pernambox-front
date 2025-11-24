@@ -16,6 +16,7 @@ import {
   UnitCreateSchema,
   type UnitCreateType,
 } from "@/schemas/dashboard/unit-create";
+import { UnitEditSchema, type UnitEditType } from "@/schemas/dashboard/unit-edit";
 import type { Unit } from "@/types/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
@@ -28,8 +29,8 @@ export function EditUnitDialog({ unit }: { unit: Unit }) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
 
-  const form = useForm<UnitCreateType>({
-    resolver: zodResolver(UnitCreateSchema),
+  const form = useForm<UnitEditType>({
+    resolver: zodResolver(UnitEditSchema),
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: {

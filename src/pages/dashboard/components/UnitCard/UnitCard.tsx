@@ -6,14 +6,27 @@ import { UnitCardHeader } from "@/pages/dashboard/components/UnitCard/UnitCardHe
 import type { Unit } from "@/types/common";
 import type { User } from "@/types/common";
 
-export function UnitCard({ unit, user }: { unit: Unit, user: User}) {
-  const { name, phone, email, responsible, address } = unit;
+export function UnitCard({ unit, user }: { unit: Unit, user: User }) {
+  const { name, phone, email, responsible, address, active } = unit;
 
   return (
     <Card>
-      <UnitCardHeader name={name} city={address.city} state={address.state} />
+      <UnitCardHeader name={name} city={address.city} state={address.state} active={active} />
 
       <CardContent className="flex flex-col gap-4">
+        <InfoBlock label="Situação">
+          {active ? (
+            <span className="text-green-400">
+              Em atividade
+            </span>
+          ) : (
+            <span className="text-red-400">
+              Desativada
+            </span>
+          )
+          }
+        </InfoBlock>
+
         <InfoBlock label="Endereço">
           {address.street}, {address.number} - {address.district},{" "}
           {address.city} - {address.state}, {address.zipCode}

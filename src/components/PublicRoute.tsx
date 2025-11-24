@@ -15,7 +15,7 @@ export function PublicRoute({ children }: { children: ReactNode }) {
     // Quando a auth já está pronta:
     // Se há token E há sessão → redirecionar home
     if (accessToken && hasSession) {
-      return <Navigate to="/dashboard" replace />;
+      return <Navigate to="/dashboard/home" replace />;
     }
     
     console.log(!isAuthReady, accessToken, hasSession);

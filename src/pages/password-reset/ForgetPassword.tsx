@@ -32,14 +32,16 @@ export default function ForgetPassword() {
 
   const onSubmit = async (data: ForgetPasswordType) => {
     useResetPasswordStore.getState().setEmail(data.email);
-    navigate("/recuperar-senha/verificar", { replace: true });
 
     try {
       const response = await requestPasswordReset(data.email);
-      if (response?.userId) setUserId(response.userId);
-      toast.success(
-        "Se esse e-mail existir em nosso sistema, enviamos instruções para ele. O código expirará em 15 minutos.",
-      );
+      if (response.success) {
+        navigate("/recuperar-senha/verificar", { replace: true });
+        if (response?.userId) setUserId(response.userId);
+        toast.success(
+          "Foram enviadas instruções para seu email. O código expirará em 15 minutos.",
+        );
+      }
     } catch (err: any) {
       const status = err?.response?.status;
       if (status === 404) {
