@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { DashboardCard } from "./components/DashboardCard";
 import { UsersTable } from "./components/tables/UsersTable";
 import { useAuthStore } from "@/stores/auth-store";
+import clsx from "clsx";
 
 interface UserStats {
   total: number;
@@ -45,7 +46,7 @@ interface PageUserResponseDto {
 
 export default function Users() {
   const [open, setOpen] = useState(false);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [size] = useState(10);
   const { user } = useAuthStore.getState();
 
@@ -257,14 +258,14 @@ export default function Users() {
                     label="Permissão"
                     options={
                       user?.role === "ADMIN_MASTER" ?
-                      [
-                        { value: "ADMIN_MASTER", label: "Administrador Geral" },
-                        { value: "ADMIN", label: "Administrador" },
-                        { value: "USER", label: "Funcionário" },
-                      ] : [
-                        { value: "ADMIN", label: "Administrador" },
-                        { value: "USER", label: "Funcionário" },
-                      ]
+                        [
+                          { value: "ADMIN_MASTER", label: "Administrador Geral" },
+                          { value: "ADMIN", label: "Administrador" },
+                          { value: "USER", label: "Funcionário" },
+                        ] : [
+                          { value: "ADMIN", label: "Administrador" },
+                          { value: "USER", label: "Funcionário" },
+                        ]
                     }
                   />
 
@@ -305,9 +306,12 @@ export default function Users() {
 
         <div className="mt-4 flex items-center justify-between">
           <button
-            disabled={page === 0 || isLoading}
+            disabled={page === 1 || isLoading}
             onClick={() => setPage((p) => Math.max(p - 1, 0))}
-            className="rounded-md border px-3 py-1"
+            className={clsx("rounded-md border px-3 py-1", {
+              "cursor-not-allowed": (page === 1 || isLoading),
+              "cursor-pointer": page !== 1
+            })}
           >
             Página anterior
           </button>
@@ -329,12 +333,15 @@ export default function Users() {
                 setPage((p) => p + 1);
               }
             }}
-            className="rounded-md border px-3 py-1"
+            className={clsx("rounded-md border px-3 py-1", {
+              "cursor-not-allowed": isLoading || (usersPage ? usersPage.currentPage >= usersPage.totalPages : false),
+              "cursor-pointer": !(usersPage ? usersPage.currentPage >= usersPage.totalPages : false),
+            })}
           >
             Próxima página
           </button>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

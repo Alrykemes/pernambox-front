@@ -18,7 +18,7 @@ export const UserCreateSchema = z.object({
     .max(15, {
       error: "O telefone deve ter no máximo 15 caracteres.",
     }),
-  role: z.enum(["ADMIN", "USER"], {
+  role: z.enum(["ADMIN_MASTER", "ADMIN", "USER"], {
     error: "Selecione um papel válido para o usuário.",
   }),
 });

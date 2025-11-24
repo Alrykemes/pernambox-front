@@ -1,5 +1,4 @@
-import { useState, useMemo } from "react";
-import { z } from "zod";
+import { useState, useMemo, type ReactNode } from "react";
 import {
   Table,
   TableBody,
@@ -29,18 +28,20 @@ import {
 } from "@/components/ui/dialog";
 
 import { Eye } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import type { LogHistory, Target, TypeLog } from "@/types/common";
+import { authApi } from "@/lib/api";
+import clsx from "clsx";
+import { formatLocalDateTime } from "@/utils/formatLocalDateTime";
 
-// Dados exemplo
-const mockLogs = Array.from({ length: 42 }).map((_, i) => ({
-  id: i + 1,
-  datetime: "29/04/2025 15:57",
-  type: ["Criação", "Atualização", "Deleção"][i % 3],
-  target: ["User", "Unidade", "Produto", "Recurso", "Destino", "Origem"][i % 6],
-  targetId: 1000 + i,
-  responsible: "Juliana Albuquerque",
-  responsibleId: 500 + i,
-  description: "Alteração realizada no registro associado.",
-}));
+interface PageLogHistoryResponseDto {
+  previousPage: number;
+  currentPage: number;
+  nextPage: number;
+  totalPages: number;
+  size: number;
+  content: LogHistory[];
+}
 
 export function LogHistory() {
   const [search, setSearch] = useState("");
@@ -48,34 +49,100 @@ export function LogHistory() {
   const [targetFilter, setTargetFilter] = useState("Todos");
 
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const [size] = useState(10);
 
   // Controle do modal
-  const [selected, setSelected] = useState<any>(null);
+  const [selected, setSelected] = useState<LogHistory | null>(null);
+
+  const { data: logHistoryPage, isLoading } = useQuery<
+    PageLogHistoryResponseDto,
+    Error,
+    PageLogHistoryResponseDto,
+    readonly ["logHistories", number, number]
+  >({
+    queryKey: ["logHistories", page, size] as const,
+    queryFn: async () => {
+      const { data } = await authApi.get(`/log-history?page=${page}&size=${size}`);
+      return data as PageLogHistoryResponseDto;
+    },
+    staleTime: 1000 * 10,
+  });
+
+  const logHistories = logHistoryPage?.content ?? [];
 
   const filteredData = useMemo(() => {
-    return mockLogs.filter((item) => {
+    return logHistories.filter((item) => {
       const matchesSearch =
         search.length === 0 ||
-        item.responsible.toLowerCase().includes(search.toLowerCase()) ||
-        item.target.toLowerCase().includes(search.toLowerCase());
+        item.responsibleUser.name.toLowerCase().includes(search.toLowerCase()) ||
+        item.logHistoryTarget.toLowerCase().includes(search.toLowerCase()) ||
+        item.id.toString().includes(search.toLowerCase());
 
       const matchesType =
-        typeFilter === "Todos" || item.type === typeFilter;
+        typeFilter === "Todos" || item.logHistoryType === typeFilter;
 
       const matchesTarget =
-        targetFilter === "Todos" || item.target === targetFilter;
+        targetFilter === "Todos" || item.logHistoryTarget === targetFilter;
 
       return matchesSearch && matchesType && matchesTarget;
     });
-  }, [search, typeFilter, targetFilter]);
+  }, [search, typeFilter, targetFilter, logHistories]);
 
-  const paginated = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filteredData.slice(start, start + pageSize);
-  }, [page, filteredData]);
+  const getLogHistoryTypeLabel = (type: TypeLog): ReactNode => {
+    return type === "CREATE" ? (
+      <div className="inline-block rounded-md bg-green-100 px-2 py-1 text-sm font-medium text-green-900">
+        Criação
+      </div>
+    ) : type === "UPDATE" ? (
+      <div className="inline-block rounded-md bg-amber-100 px-2 py-1 text-sm font-medium text-amber-900">
+        Atualização
+      </div>
+    ) : type === "DELETE" ? (
+      <div className="inline-block rounded-md bg-red-100 px-2 py-1 text-sm font-medium text-red-900">
+        Deleção
+      </div>
+    ) : (
+      <div className="inline-block rounded-md bg-gray-200 px-2 py-1 text-sm font-medium text-black-900">
+        Inválido
+      </div>
+    )
+  }
 
-  const totalPages = Math.ceil(filteredData.length / pageSize);
+  const getLogHistoryTargetLabel = (target: Target): ReactNode => {
+    return target === "UNIT" ? (
+      <div className="inline-block rounded-md bg-gray-200 px-2 py-1 text-sm font-medium text-black-900">
+        Unidade
+      </div>
+    ) : target === "USER" ? (
+      <div className="inline-block rounded-md bg-gray-200 px-2 py-1 text-sm font-medium text-black-900">
+        Usuário
+      </div>
+    ) : target === "PRODUCT" ? (
+      <div className="inline-block rounded-md bg-gray-200 px-2 py-1 text-sm font-medium text-black-900">
+        Produto
+      </div>
+    ) : target === "RESOURCE" ? (
+      <div className="inline-block rounded-md bg-gray-200 px-2 py-1 text-sm font-medium text-black-900">
+        Recurso
+      </div>
+    ) : target === "RESOURCE_PRODUCT" ? (
+      <div className="inline-block rounded-md bg-gray-200 px-2 py-1 text-sm font-medium text-black-900">
+        Produto em Recurso
+      </div>
+    ) : target === "ORIGIN" ? (
+      <div className="inline-block rounded-md bg-gray-200 px-2 py-1 text-sm font-medium text-black-900">
+        Origem
+      </div>
+    ) : target === "DESTINATION" ? (
+      <div className="inline-block rounded-md bg-gray-200 px-2 py-1 text-sm font-medium text-black-900">
+        Destino
+      </div>
+    ) : (
+      <div className="inline-block rounded-md bg-gray-200 px-2 py-1 text-sm font-medium text-black-900">
+        Inválido
+      </div>
+    )
+  }
 
   return (
     <div className="p-6">
@@ -83,19 +150,19 @@ export function LogHistory() {
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Detalhes da Movimentação</DialogTitle>
+            <DialogTitle>Detalhes da Alteração</DialogTitle>
           </DialogHeader>
 
           {selected && (
             <div className="space-y-2 text-sm">
               <p><strong>ID:</strong> {selected.id}</p>
-              <p><strong>Data/Hora:</strong> {selected.datetime}</p>
-              <p><strong>Tipo:</strong> {selected.type}</p>
-              <p><strong>Alvo:</strong> {selected.target}</p>
-              <p><strong>ID do Alvo:</strong> {selected.targetId}</p>
-              <p><strong>Responsável:</strong> {selected.responsible}</p>
-              <p><strong>ID do Responsável:</strong> {selected.responsibleId}</p>
+              <p><strong>Data/Hora:</strong> {formatLocalDateTime(selected.dateTime)}</p>
               <p><strong>Descrição:</strong> {selected.description}</p>
+              <p><strong>Tipo:</strong> {getLogHistoryTypeLabel(selected.logHistoryType)}</p>
+              <p><strong>ID do Alvo:</strong> {selected.targetId}</p>
+              <p><strong>Alvo:</strong> {getLogHistoryTargetLabel(selected.logHistoryTarget)}</p>
+              <p><strong>ID do Responsável:</strong> {selected.responsibleUser.userId}</p>
+              <p><strong>Responsável:</strong> {selected.responsibleUser.name}</p>
             </div>
           )}
 
@@ -110,7 +177,7 @@ export function LogHistory() {
       {/* Conteúdo Principal */}
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Histórico de Movimentações</CardTitle>
+          <CardTitle>Histórico de Alterações</CardTitle>
           <p className="text-sm text-muted-foreground">
             Logs de todas as atividades
           </p>
@@ -132,9 +199,9 @@ export function LogHistory() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Todos">Todos</SelectItem>
-                <SelectItem value="Criação">Criação</SelectItem>
-                <SelectItem value="Atualização">Atualização</SelectItem>
-                <SelectItem value="Deleção">Deleção</SelectItem>
+                <SelectItem value="CREATE">Criação</SelectItem>
+                <SelectItem value="UPDATE">Atualização</SelectItem>
+                <SelectItem value="DELETE">Deleção</SelectItem>
               </SelectContent>
             </Select>
 
@@ -144,12 +211,12 @@ export function LogHistory() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Todos">Todos</SelectItem>
-                <SelectItem value="User">User</SelectItem>
-                <SelectItem value="Unidade">Unidade</SelectItem>
-                <SelectItem value="Produto">Produto</SelectItem>
-                <SelectItem value="Recurso">Recurso</SelectItem>
-                <SelectItem value="Destino">Destino</SelectItem>
-                <SelectItem value="Origem">Origem</SelectItem>
+                <SelectItem value="USER">User</SelectItem>
+                <SelectItem value="UNIT">Unidade</SelectItem>
+                <SelectItem value="PRODUCT">Produto</SelectItem>
+                <SelectItem value="RESOURCE">Recurso</SelectItem>
+                <SelectItem value="DESTINATION">Destino</SelectItem>
+                <SelectItem value="ORIGIN">Origem</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -168,12 +235,12 @@ export function LogHistory() {
               </TableHeader>
 
               <TableBody>
-                {paginated.map((item) => (
+                {filteredData.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell>{item.datetime}</TableCell>
-                    <TableCell>{item.type}</TableCell>
-                    <TableCell>{item.target}</TableCell>
-                    <TableCell>{item.responsible}</TableCell>
+                    <TableCell>{formatLocalDateTime(item.dateTime)}</TableCell>
+                    <TableCell>{getLogHistoryTypeLabel(item.logHistoryType)}</TableCell>
+                    <TableCell>{getLogHistoryTargetLabel(item.logHistoryTarget)}</TableCell>
+                    <TableCell>{item.responsibleUser.name}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         size="icon"
@@ -186,7 +253,7 @@ export function LogHistory() {
                   </TableRow>
                 ))}
 
-                {paginated.length === 0 && (
+                {filteredData.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-6">
                       Nenhum registro encontrado.
@@ -198,28 +265,42 @@ export function LogHistory() {
           </div>
 
           {/* Paginação */}
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Página {page} de {totalPages}
-            </p>
+          <div className="mt-4 flex items-center justify-between">
+            <button
+              disabled={page === 1 || isLoading}
+              onClick={() => setPage((p) => Math.max(p - 1, 0))}
+              className={clsx("rounded-md border px-3 py-1", {
+                "cursor-not-allowed": (page === 1 || isLoading),
+                "cursor-pointer": page !== 1
+              })}
+            >
+              Página anterior
+            </button>
 
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                disabled={page === 1}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                Anterior
-              </Button>
+            <span>
+              Página {logHistoryPage?.currentPage ?? page + 1} de{" "}
+              {logHistoryPage?.totalPages ?? 1}
+            </span>
 
-              <Button
-                variant="outline"
-                disabled={page === totalPages}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Próxima
-              </Button>
-            </div>
+            <button
+              disabled={
+                isLoading ||
+                (logHistoryPage
+                  ? logHistoryPage.currentPage >= logHistoryPage.totalPages
+                  : false)
+              }
+              onClick={() => {
+                if (!logHistoryPage || logHistoryPage.currentPage < logHistoryPage.totalPages) {
+                  setPage((p) => p + 1);
+                }
+              }}
+              className={clsx("rounded-md border px-3 py-1", {
+                "cursor-not-allowed": isLoading || (logHistoryPage ? logHistoryPage.currentPage >= logHistoryPage.totalPages : false),
+                "cursor-pointer": !(logHistoryPage ? logHistoryPage.currentPage >= logHistoryPage.totalPages : false),
+              })}
+            >
+              Próxima página
+            </button>
           </div>
         </CardContent>
       </Card>
