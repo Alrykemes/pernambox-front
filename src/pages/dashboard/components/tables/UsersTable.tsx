@@ -223,7 +223,7 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
                 </TableCell>
 
                 <TableCell>
-                  <div className="inline-block rounded-md bg-slate-100 px-2 py-1 text-sm font-medium">
+                  <div className="inline-block rounded-md px-2 py-1 text-sm font-medium">
                     {u.role}
                   </div>
                 </TableCell>

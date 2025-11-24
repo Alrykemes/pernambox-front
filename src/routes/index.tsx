@@ -34,7 +34,7 @@ export const routes: RouteObject[] = [
     handle: { breadcrumb: "Dashboard" },
   },
   {
-    path: "/configurações",
+    path: "/configuracoes",
     element: (
       <ProtectedRoute>
         <DashboardLayout />

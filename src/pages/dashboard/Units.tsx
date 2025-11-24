@@ -133,7 +133,7 @@ export default function UnitPage() {
           {user?.role === "ADMIN_MASTER" && (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-blue-950 hover:bg-blue-900">
+                <Button className="bg-blue-950 hover:bg-blue-900 text-white">
                   <Plus />
                   Adicionar Unidade
                 </Button>
