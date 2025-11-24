@@ -1,6 +1,5 @@
 import SystemConfig from "@/pages/config/SystemConfig";
 import UserProfile from "@/pages/config/UserProfile";
-import SystemConfig from "@/pages/config/SystemConfig";
 import { Navigate } from "react-router-dom";
 
 export const configRoutes = [
