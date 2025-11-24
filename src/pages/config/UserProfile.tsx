@@ -52,7 +52,7 @@ export default function UserProfile() {
       cpf: user?.cpf ?? '',
       phone: user?.phone ?? '',
       password: "",
-      imageProfile: ""
+      imageProfile: undefined
     },
   });
 
@@ -75,7 +75,7 @@ export default function UserProfile() {
       file?: File | undefined;
     }) => {
 
-      if (payload.file) {
+      if (!!payload.file) {
         const formData = new FormData();
         formData.append("files", payload.file);
 
@@ -112,6 +112,7 @@ export default function UserProfile() {
         cpf: user?.cpf,
         phone: user?.phone,
         password: "",
+        imageProfile: undefined,
         file: undefined
       });
 
