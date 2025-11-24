@@ -1,4 +1,5 @@
 import App from "@/App.tsx";
+import { AccessibilityProvider } from "@/components/AccessibilityProvider";
 import { AuthInitializer } from "@/components/AuthInitializer.tsx";
 import { Toaster } from "@/components/ui/sonner";
 import "@/index.css";
@@ -11,12 +12,14 @@ import { createRoot } from "react-dom/client";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-      <AuthInitializer>
-        <QueryClientProvider client={queryClient}>
-          <App />
-        </QueryClientProvider>
-      </AuthInitializer>
-      <Toaster position="top-center" />
+      <AccessibilityProvider>
+        <AuthInitializer>
+          <QueryClientProvider client={queryClient}>
+            <App />
+          </QueryClientProvider>
+        </AuthInitializer>
+        <Toaster position="top-center" />
+      </AccessibilityProvider>
     </ThemeProvider>
   </StrictMode>,
 );
