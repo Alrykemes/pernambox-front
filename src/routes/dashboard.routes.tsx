@@ -3,6 +3,8 @@ import { LogHistory } from "@/pages/dashboard/LogHistory";
 import Unit from "@/pages/dashboard/Units";
 import Users from "@/pages/dashboard/Users";
 import { Navigate } from "react-router-dom";
+import Products from "@/pages/dashboard/Products";
+import InventoryPage from "@/pages/dashboard/Inventory";
 
 export const dashboardRoutes = [
   {
@@ -18,6 +20,16 @@ export const dashboardRoutes = [
     path: "unidades",
     element: <Unit />,
     handle: { breadcrumb: "Unidades" },
+  },
+  {
+    path: "produtos",
+    element: <Products />,
+    handle: { breadcrumb: "Produtos" },
+  },
+  {
+    path: "estoque",
+    element: <InventoryPage />,
+    handle: { breadcrumb: "Estoque" },
   },
   {
     path: "usuarios",
